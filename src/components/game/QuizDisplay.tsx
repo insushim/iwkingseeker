@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import Timer from './Timer';
@@ -178,9 +178,10 @@ export default function QuizDisplay() {
           <p className="text-gray-300 text-lg">
             학생의 답을 들은 후 판정해주세요
           </p>
-          <p className="text-sm text-gray-500">
-            정답: <span className="text-yellow-400 font-bold">{currentQuestion.correct_answer}</span>
-          </p>
+          <details className="text-sm text-gray-600 cursor-pointer select-none">
+            <summary className="hover:text-gray-400">정답 확인 (교사용 - 터치해서 확인)</summary>
+            <p className="mt-1 text-yellow-400 font-bold text-lg">{currentQuestion.correct_answer}</p>
+          </details>
           <div className="flex gap-4">
             <motion.button
               className="px-10 py-5 bg-green-600 hover:bg-green-500 text-white rounded-xl text-2xl font-black"
