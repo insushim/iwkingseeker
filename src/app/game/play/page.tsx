@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import { useFullscreen } from '@/hooks/useFullscreen';
@@ -13,17 +14,25 @@ import QuizDisplay from '@/components/game/QuizDisplay';
 import KingGuess from '@/components/game/KingGuess';
 import RoundResult from '@/components/game/RoundResult';
 import GameOver from '@/components/game/GameOver';
-import { Maximize, Minimize, Pause } from 'lucide-react';
+import { Maximize, Minimize } from 'lucide-react';
 
 export default function GamePlayPage() {
+  const router = useRouter();
   const {
     phase,
+    teamA,
     questionPool,
     usedQuestionIds,
     setCurrentQuestion,
     currentQuestion,
   } = useGameStore();
   const { isFullscreen, toggleFullscreen } = useFullscreen();
+
+  useEffect(() => {
+    if (phase === 'SETUP' || teamA.students.length === 0) {
+      router.replace('/game/setup');
+    }
+  }, [phase, teamA.students.length, router]);
 
   const loadNextQuestion = useCallback(() => {
     if (phase === 'QUIZ' && !currentQuestion && questionPool.length > 0) {
