@@ -178,10 +178,6 @@ export default function QuizDisplay() {
           <p className="text-gray-300 text-lg">
             학생의 답을 들은 후 판정해주세요
           </p>
-          <details className="text-sm text-gray-600 cursor-pointer select-none">
-            <summary className="hover:text-gray-400">정답 확인 (교사용 - 터치해서 확인)</summary>
-            <p className="mt-1 text-yellow-400 font-bold text-lg">{currentQuestion.correct_answer}</p>
-          </details>
           <div className="flex gap-4">
             <motion.button
               className="px-10 py-5 bg-green-600 hover:bg-green-500 text-white rounded-xl text-2xl font-black"
@@ -234,7 +230,7 @@ export default function QuizDisplay() {
         )}
       </AnimatePresence>
 
-      {showResult && currentQuestion.explanation && (
+      {showResult && isCorrect && currentQuestion.explanation && (
         <motion.div
           className="w-full bg-gray-800/60 rounded-xl p-4 border border-gray-600/30"
           initial={{ y: 10, opacity: 0 }}
@@ -245,6 +241,13 @@ export default function QuizDisplay() {
           </p>
         </motion.div>
       )}
+
+      <div className="fixed bottom-2 left-2 z-50">
+        <details className="cursor-pointer select-none">
+          <summary className="text-[10px] text-gray-700 hover:text-gray-500">답</summary>
+          <p className="text-[11px] text-gray-500 bg-gray-900/90 px-2 py-1 rounded mt-0.5">{currentQuestion.correct_answer}</p>
+        </details>
+      </div>
     </div>
   );
 }
