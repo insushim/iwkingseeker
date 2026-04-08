@@ -1,5 +1,9 @@
 import { seedPart1 } from './seed-part1';
 import { seedPart2 } from './seed-part2';
+import { seed2022Grade3 } from './seed-2022-grade3';
+import { seed2022Grade4 } from './seed-2022-grade4';
+import { seed2022Grade5 } from './seed-2022-grade5';
+import { seed2022Grade6 } from './seed-2022-grade6';
 
 export interface QuestionSeed {
   grade: number;
@@ -375,7 +379,10 @@ const baseQuestions: QuestionSeed[] = [
 
 // 중복 제거 후 통합
 const seen = new Set<string>();
-export const questionsSeed: QuestionSeed[] = [...baseQuestions, ...seedPart1, ...seedPart2].filter((q) => {
+export const questionsSeed: QuestionSeed[] = [
+  ...baseQuestions, ...seedPart1, ...seedPart2,
+  ...seed2022Grade3, ...seed2022Grade4, ...seed2022Grade5, ...seed2022Grade6,
+].filter((q) => {
   const key = `${q.grade}-${q.subject}-${q.question_text}`;
   if (seen.has(key)) return false;
   seen.add(key);
