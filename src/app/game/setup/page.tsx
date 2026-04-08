@@ -1,12 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useGameStore } from '@/stores/gameStore';
 import { GRADES, SUBJECTS, CURRICULUM_UNITS, TARGET_SCORES, TIMER_OPTIONS, TEAM_DEFAULTS } from '@/lib/constants';
 import { splitIntoTeams } from '@/lib/utils';
-import { Crown, ChevronRight, Users, BookOpen, Settings, Play } from 'lucide-react';
+import { Crown, ChevronRight, Users, BookOpen, Settings, Play, Save, FolderOpen, Trash2 } from 'lucide-react';
+
+interface SavedClass {
+  name: string;
+  students: string;
+}
+
+const STORAGE_KEY = 'kingseeker_classes';
+
+function getSavedClasses(): SavedClass[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveClasses(classes: SavedClass[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(classes));
+}
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -22,6 +43,31 @@ export default function GameSetupPage() {
   const [timerSeconds, setTimerSeconds] = useState(30);
   const [teamAName, setTeamAName] = useState(TEAM_DEFAULTS.A.name);
   const [teamBName, setTeamBName] = useState(TEAM_DEFAULTS.B.name);
+  const [savedClasses, setSavedClasses] = useState<SavedClass[]>([]);
+  const [className, setClassName] = useState('');
+
+  useEffect(() => {
+    setSavedClasses(getSavedClasses());
+  }, []);
+
+  const handleSaveClass = () => {
+    if (!className.trim() || !studentInput.trim()) return;
+    const updated = savedClasses.filter((c) => c.name !== className.trim());
+    updated.push({ name: className.trim(), students: studentInput });
+    saveClasses(updated);
+    setSavedClasses(updated);
+    setClassName('');
+  };
+
+  const handleLoadClass = (cls: SavedClass) => {
+    setStudentInput(cls.students);
+  };
+
+  const handleDeleteClass = (name: string) => {
+    const updated = savedClasses.filter((c) => c.name !== name);
+    saveClasses(updated);
+    setSavedClasses(updated);
+  };
 
   const students = studentInput
     .split('\n')
@@ -122,14 +168,58 @@ export default function GameSetupPage() {
                 className="flex flex-col gap-4"
               >
                 <h2 className="text-xl font-bold text-white">학생 이름 입력</h2>
+
+                {savedClasses.length > 0 && (
+                  <div className="bg-gray-800/60 rounded-xl p-3 border border-gray-700/50">
+                    <p className="text-sm text-gray-400 mb-2 flex items-center gap-1">
+                      <FolderOpen className="w-4 h-4" /> 저장된 학급
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {savedClasses.map((cls) => (
+                        <div key={cls.name} className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleLoadClass(cls)}
+                            className="px-3 py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 rounded-lg text-sm font-medium"
+                          >
+                            {cls.name}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClass(cls.name)}
+                            className="p-1 text-gray-500 hover:text-red-400"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <p className="text-gray-400 text-sm">한 줄에 한 명씩 입력하세요 (최소 4명)</p>
                 <textarea
                   value={studentInput}
                   onChange={(e) => setStudentInput(e.target.value)}
                   placeholder={"김민수\n이영희\n박철수\n정수진\n..."}
-                  className="w-full h-64 bg-gray-900 border border-gray-700 rounded-xl p-4 text-white resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                  className="w-full h-52 bg-gray-900 border border-gray-700 rounded-xl p-4 text-white resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
                 />
-                <p className="text-sm text-gray-500">현재 {students.length}명 입력됨</p>
+
+                <div className="flex items-center gap-2">
+                  <p className="text-sm text-gray-500 flex-1">현재 {students.length}명 입력됨</p>
+                  <input
+                    value={className}
+                    onChange={(e) => setClassName(e.target.value)}
+                    placeholder="학급 이름 (예: 5-3반)"
+                    className="px-3 py-1.5 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm outline-none focus:ring-1 focus:ring-purple-500 w-40"
+                  />
+                  <button
+                    onClick={handleSaveClass}
+                    disabled={!className.trim() || students.length < 1}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-green-600/30 hover:bg-green-600/50 text-green-400 rounded-lg text-sm font-medium disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    <Save className="w-4 h-4" /> 저장
+                  </button>
+                </div>
+
                 <button
                   onClick={() => setStep(2)}
                   disabled={students.length < 4}
