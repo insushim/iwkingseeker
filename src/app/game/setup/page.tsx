@@ -91,9 +91,20 @@ export default function GameSetupPage() {
     const [teamAStudents, teamBStudents] = splitIntoTeams(students);
 
     const { questionsSeed } = await import('@/data/questions-seed');
-    const filtered = questionsSeed.filter(
+    // 1순위: 선택한 단원 문제
+    const unitQuestions = questionsSeed.filter(
       (q) => q.grade === grade && q.subject === subject && q.unit === unit
     );
+    // 2순위: 같은 학년+과목의 다른 단원 문제 (풀이 적을 때 보충)
+    const MIN_POOL = 20;
+    let filtered = unitQuestions;
+    if (unitQuestions.length < MIN_POOL) {
+      const sameSubject = questionsSeed.filter(
+        (q) => q.grade === grade && q.subject === subject && q.unit !== unit
+      );
+      const extra = sameSubject.sort(() => Math.random() - 0.5).slice(0, MIN_POOL - unitQuestions.length);
+      filtered = [...unitQuestions, ...extra];
+    }
     const rawPool = filtered.map((q) => ({
       id: `seed-${Math.random().toString(36).slice(2, 10)}`,
       grade: q.grade,
