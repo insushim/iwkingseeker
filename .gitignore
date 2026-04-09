@@ -15,7 +15,7 @@
 
 # next.js
 /.next/
-/out/
+# /out/ — Cloudflare Pages 배포용으로 커밋에 포함
 
 # production
 /build
