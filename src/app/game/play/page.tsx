@@ -2,10 +2,11 @@
 
 import { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import { useFullscreen } from '@/hooks/useFullscreen';
 import { pickQuestion } from '@/lib/questionPicker';
+import { playPhaseTransition } from '@/lib/sounds';
 import ScoreBoard from '@/components/game/ScoreBoard';
 import TeamSplitter from '@/components/game/TeamSplitter';
 import KingSelector from '@/components/game/KingSelector';
@@ -15,6 +16,7 @@ import KingGuess from '@/components/game/KingGuess';
 import RoundResult from '@/components/game/RoundResult';
 import GameOver from '@/components/game/GameOver';
 import { Maximize, Minimize } from 'lucide-react';
+import { useRef } from 'react';
 
 export default function GamePlayPage() {
   const router = useRouter();
@@ -27,12 +29,21 @@ export default function GamePlayPage() {
     currentQuestion,
   } = useGameStore();
   const { isFullscreen, toggleFullscreen } = useFullscreen();
+  const prevPhaseRef = useRef(phase);
 
   useEffect(() => {
     if (phase === 'SETUP' || teamA.students.length === 0) {
       router.replace('/game/setup');
     }
   }, [phase, teamA.students.length, router]);
+
+  // Play transition sound on phase change
+  useEffect(() => {
+    if (prevPhaseRef.current !== phase && phase !== 'SETUP') {
+      playPhaseTransition();
+    }
+    prevPhaseRef.current = phase;
+  }, [phase]);
 
   const loadNextQuestion = useCallback(() => {
     if (phase === 'QUIZ' && !currentQuestion && questionPool.length > 0) {
@@ -61,37 +72,55 @@ export default function GamePlayPage() {
   const showScoreboard = !['SETUP', 'TEAM_SPLIT', 'GAME_OVER'].includes(phase);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a0a2e] via-[#16082b] to-[#0d0520] flex flex-col">
-      <div className="flex items-center justify-between px-4 py-2">
+    <div className="min-h-screen bg-mesh bg-mesh-animated flex flex-col relative noise-overlay">
+      {/* Top bar */}
+      <div className="relative z-10 flex items-center justify-between px-4 py-2">
         {showScoreboard ? (
-          <div className="flex-1">
+          <motion.div
+            className="flex-1"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.4 }}
+          >
             <ScoreBoard />
-          </div>
+          </motion.div>
         ) : (
           <div className="flex-1" />
         )}
 
         <div className="flex items-center gap-2 ml-4">
-          <button
+          <motion.button
             onClick={toggleFullscreen}
-            className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-400"
+            className="p-2 glass rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
             title={isFullscreen ? '전체화면 종료' : '전체화면'}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
           >
             {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
-          </button>
+          </motion.button>
         </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
+      {/* Main content */}
+      <div className="relative z-10 flex-1 flex items-center justify-center px-4 py-8">
         <AnimatePresence mode="wait">
-          {phase === 'TEAM_SPLIT' && <TeamSplitter key="team-split" />}
-          {phase === 'KING_SELECT_A' && <KingSelector key="king-a" selectingTeam="team_a" />}
-          {phase === 'KING_SELECT_B' && <KingSelector key="king-b" selectingTeam="team_b" />}
-          {phase === 'RPS' && <RockPaperScissors key="rps" />}
-          {phase === 'QUIZ' && <QuizDisplay key="quiz" />}
-          {phase === 'GUESS_KING' && <KingGuess key="guess" />}
-          {phase === 'ROUND_RESULT' && <RoundResult key="round-result" />}
-          {phase === 'GAME_OVER' && <GameOver key="game-over" />}
+          <motion.div
+            key={phase}
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.98 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="w-full flex items-center justify-center"
+          >
+            {phase === 'TEAM_SPLIT' && <TeamSplitter />}
+            {phase === 'KING_SELECT_A' && <KingSelector selectingTeam="team_a" />}
+            {phase === 'KING_SELECT_B' && <KingSelector selectingTeam="team_b" />}
+            {phase === 'RPS' && <RockPaperScissors />}
+            {phase === 'QUIZ' && <QuizDisplay />}
+            {phase === 'GUESS_KING' && <KingGuess />}
+            {phase === 'ROUND_RESULT' && <RoundResult />}
+            {phase === 'GAME_OVER' && <GameOver />}
+          </motion.div>
         </AnimatePresence>
       </div>
     </div>

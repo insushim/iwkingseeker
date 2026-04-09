@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useGameStore } from '@/stores/gameStore';
 import { GRADES, SUBJECTS, CURRICULUM_UNITS, TARGET_SCORES, TIMER_OPTIONS, TEAM_DEFAULTS } from '@/lib/constants';
 import { splitIntoTeams } from '@/lib/utils';
-import { Crown, ChevronRight, Users, BookOpen, Settings, Play, Save, FolderOpen, Trash2 } from 'lucide-react';
+import { playButtonClick, playPhaseTransition } from '@/lib/sounds';
+import { Crown, ChevronRight, Users, BookOpen, Settings, Play, Save, FolderOpen, Trash2, Check, Gamepad2 } from 'lucide-react';
 
 interface SavedClass {
   name: string;
@@ -50,6 +51,11 @@ export default function GameSetupPage() {
     setSavedClasses(getSavedClasses());
   }, []);
 
+  const handleStepChange = (newStep: Step) => {
+    playButtonClick();
+    setStep(newStep);
+  };
+
   const handleSaveClass = () => {
     if (!className.trim() || !studentInput.trim()) return;
     const updated = savedClasses.filter((c) => c.name !== className.trim());
@@ -60,6 +66,7 @@ export default function GameSetupPage() {
   };
 
   const handleLoadClass = (cls: SavedClass) => {
+    playButtonClick();
     setStudentInput(cls.students);
   };
 
@@ -78,6 +85,7 @@ export default function GameSetupPage() {
 
   const handleStart = async () => {
     if (students.length < 4 || !unit) return;
+    playPhaseTransition();
 
     const [teamAStudents, teamBStudents] = splitIntoTeams(students);
 
@@ -117,16 +125,17 @@ export default function GameSetupPage() {
   };
 
   const stepLabels = [
-    { icon: <Users className="w-5 h-5" />, label: '학생 입력' },
-    { icon: <BookOpen className="w-5 h-5" />, label: '과목 선택' },
-    { icon: <Settings className="w-5 h-5" />, label: '설정' },
-    { icon: <Play className="w-5 h-5" />, label: '팀 이름' },
+    { icon: <Users className="w-4 h-4" />, label: '학생' },
+    { icon: <BookOpen className="w-4 h-4" />, label: '과목' },
+    { icon: <Settings className="w-4 h-4" />, label: '설정' },
+    { icon: <Play className="w-4 h-4" />, label: '시작' },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a0a2e] to-[#0d0520] flex flex-col">
-      <header className="flex items-center gap-3 px-6 py-4 border-b border-gray-800">
-        <Crown className="w-7 h-7 text-yellow-400" />
+    <div className="min-h-screen bg-mesh bg-mesh-animated flex flex-col noise-overlay">
+      {/* Header */}
+      <header className="relative z-10 flex items-center gap-3 px-6 py-4 border-b border-white/5">
+        <Crown className="w-7 h-7 text-yellow-400" style={{ filter: 'drop-shadow(0 0 6px rgba(250,204,21,0.3))' }} />
         <h1
           className="text-2xl font-black text-white"
           style={{ fontFamily: "var(--font-heading), sans-serif" }}
@@ -135,28 +144,32 @@ export default function GameSetupPage() {
         </h1>
       </header>
 
-      <div className="flex items-center justify-center gap-2 px-6 py-4">
+      {/* Step indicator */}
+      <div className="relative z-10 flex items-center justify-center gap-1.5 px-6 py-4">
         {stepLabels.map((s, i) => (
-          <div key={i} className="flex items-center gap-2">
+          <div key={i} className="flex items-center gap-1.5">
             <motion.button
-              onClick={() => setStep((i + 1) as Step)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold ${
+              onClick={() => handleStepChange((i + 1) as Step)}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold transition-all ${
                 step === i + 1
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white glow-purple'
                   : step > i + 1
-                    ? 'bg-green-600/30 text-green-400'
-                    : 'bg-gray-800 text-gray-500'
+                    ? 'glass text-green-400'
+                    : 'glass text-gray-500'
               }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              {s.icon}
+              {step > i + 1 ? <Check className="w-4 h-4" /> : s.icon}
               {s.label}
             </motion.button>
-            {i < 3 && <ChevronRight className="w-4 h-4 text-gray-600" />}
+            {i < 3 && <ChevronRight className="w-3 h-3 text-gray-600" />}
           </div>
         ))}
       </div>
 
-      <div className="flex-1 flex items-start justify-center px-4 py-8">
+      {/* Content */}
+      <div className="relative z-10 flex-1 flex items-start justify-center px-4 py-6">
         <div className="w-full max-w-2xl">
           <AnimatePresence mode="wait">
             {step === 1 && (
@@ -170,7 +183,7 @@ export default function GameSetupPage() {
                 <h2 className="text-xl font-bold text-white">학생 이름 입력</h2>
 
                 {savedClasses.length > 0 && (
-                  <div className="bg-gray-800/60 rounded-xl p-3 border border-gray-700/50">
+                  <div className="glass rounded-xl p-3">
                     <p className="text-sm text-gray-400 mb-2 flex items-center gap-1">
                       <FolderOpen className="w-4 h-4" /> 저장된 학급
                     </p>
@@ -179,13 +192,13 @@ export default function GameSetupPage() {
                         <div key={cls.name} className="flex items-center gap-1">
                           <button
                             onClick={() => handleLoadClass(cls)}
-                            className="px-3 py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 rounded-lg text-sm font-medium"
+                            className="px-3 py-1.5 glass hover:bg-purple-500/20 text-purple-300 rounded-lg text-sm font-medium transition-colors"
                           >
                             {cls.name}
                           </button>
                           <button
                             onClick={() => handleDeleteClass(cls.name)}
-                            className="p-1 text-gray-500 hover:text-red-400"
+                            className="p-1 text-gray-600 hover:text-red-400 transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -200,33 +213,37 @@ export default function GameSetupPage() {
                   value={studentInput}
                   onChange={(e) => setStudentInput(e.target.value)}
                   placeholder={"김민수\n이영희\n박철수\n정수진\n..."}
-                  className="w-full h-52 bg-gray-900 border border-gray-700 rounded-xl p-4 text-white resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                  className="w-full h-52 glass-strong rounded-xl p-4 text-white resize-none focus:ring-2 focus:ring-purple-500/50 outline-none placeholder:text-gray-600"
                 />
 
                 <div className="flex items-center gap-2">
-                  <p className="text-sm text-gray-500 flex-1">현재 {students.length}명 입력됨</p>
+                  <p className="text-sm text-gray-500 flex-1">
+                    현재 <span className="text-purple-400 font-bold">{students.length}</span>명 입력됨
+                  </p>
                   <input
                     value={className}
                     onChange={(e) => setClassName(e.target.value)}
-                    placeholder="학급 이름 (예: 5-3반)"
-                    className="px-3 py-1.5 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm outline-none focus:ring-1 focus:ring-purple-500 w-40"
+                    placeholder="학급 이름"
+                    className="px-3 py-1.5 glass rounded-lg text-white text-sm outline-none focus:ring-1 focus:ring-purple-500/50 w-32 placeholder:text-gray-600"
                   />
                   <button
                     onClick={handleSaveClass}
                     disabled={!className.trim() || students.length < 1}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-green-600/30 hover:bg-green-600/50 text-green-400 rounded-lg text-sm font-medium disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="flex items-center gap-1 px-3 py-1.5 glass hover:bg-green-500/20 text-green-400 rounded-lg text-sm font-medium disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     <Save className="w-4 h-4" /> 저장
                   </button>
                 </div>
 
-                <button
-                  onClick={() => setStep(2)}
+                <motion.button
+                  onClick={() => handleStepChange(2)}
                   disabled={students.length < 4}
-                  className="w-full py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-700 disabled:text-gray-500 text-white font-bold rounded-xl"
+                  className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:from-gray-700 disabled:to-gray-700 disabled:text-gray-500 text-white font-bold rounded-xl transition-all"
+                  whileHover={students.length >= 4 ? { scale: 1.01 } : {}}
+                  whileTap={students.length >= 4 ? { scale: 0.99 } : {}}
                 >
                   다음
-                </button>
+                </motion.button>
               </motion.div>
             )}
 
@@ -236,25 +253,27 @@ export default function GameSetupPage() {
                 initial={{ x: 50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -50, opacity: 0 }}
-                className="flex flex-col gap-4"
+                className="flex flex-col gap-5"
               >
-                <h2 className="text-xl font-bold text-white">학년 / 과목 / 단원 선택</h2>
+                <h2 className="text-xl font-bold text-white">학년 / 과목 / 단원</h2>
 
                 <div>
                   <label className="text-sm text-gray-400 block mb-2">학년</label>
                   <div className="flex gap-2">
                     {GRADES.map((g) => (
-                      <button
+                      <motion.button
                         key={g}
-                        onClick={() => { setGrade(g); setUnit(''); }}
-                        className={`flex-1 py-3 rounded-xl font-bold text-lg ${
+                        onClick={() => { playButtonClick(); setGrade(g); setUnit(''); }}
+                        className={`flex-1 py-3 rounded-xl font-bold text-lg transition-all ${
                           grade === g
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white glow-purple'
+                            : 'glass text-gray-400 hover:bg-white/5'
                         }`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                       >
                         {g}학년
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
@@ -263,47 +282,53 @@ export default function GameSetupPage() {
                   <label className="text-sm text-gray-400 block mb-2">과목</label>
                   <div className="grid grid-cols-3 gap-2">
                     {SUBJECTS.map((s) => (
-                      <button
+                      <motion.button
                         key={s}
-                        onClick={() => { setSubject(s); setUnit(''); }}
-                        className={`py-3 rounded-xl font-bold ${
+                        onClick={() => { playButtonClick(); setSubject(s); setUnit(''); }}
+                        className={`py-3 rounded-xl font-bold transition-all ${
                           subject === s
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white glow-purple'
+                            : 'glass text-gray-400 hover:bg-white/5'
                         }`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                       >
                         {s}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
 
                 <div>
                   <label className="text-sm text-gray-400 block mb-2">단원</label>
-                  <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
+                  <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1">
                     {units.map((u) => (
-                      <button
+                      <motion.button
                         key={u}
-                        onClick={() => setUnit(u)}
-                        className={`text-left px-4 py-3 rounded-xl font-medium text-sm ${
+                        onClick={() => { playButtonClick(); setUnit(u); }}
+                        className={`text-left px-4 py-3 rounded-xl font-medium text-sm transition-all ${
                           unit === u
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white glow-purple'
+                            : 'glass text-gray-400 hover:bg-white/5'
                         }`}
+                        whileHover={{ x: 4 }}
                       >
+                        {unit === u && <Check className="w-4 h-4 inline-block mr-2" />}
                         {u}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
 
-                <button
-                  onClick={() => setStep(3)}
+                <motion.button
+                  onClick={() => handleStepChange(3)}
                   disabled={!unit}
-                  className="w-full py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-700 disabled:text-gray-500 text-white font-bold rounded-xl"
+                  className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:from-gray-700 disabled:to-gray-700 disabled:text-gray-500 text-white font-bold rounded-xl"
+                  whileHover={unit ? { scale: 1.01 } : {}}
+                  whileTap={unit ? { scale: 0.99 } : {}}
                 >
                   다음
-                </button>
+                </motion.button>
               </motion.div>
             )}
 
@@ -313,7 +338,7 @@ export default function GameSetupPage() {
                 initial={{ x: 50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -50, opacity: 0 }}
-                className="flex flex-col gap-4"
+                className="flex flex-col gap-5"
               >
                 <h2 className="text-xl font-bold text-white">게임 설정</h2>
 
@@ -321,17 +346,19 @@ export default function GameSetupPage() {
                   <label className="text-sm text-gray-400 block mb-2">목표 점수</label>
                   <div className="flex gap-2">
                     {TARGET_SCORES.map((s) => (
-                      <button
+                      <motion.button
                         key={s}
-                        onClick={() => setTargetScore(s)}
-                        className={`flex-1 py-3 rounded-xl font-bold text-lg ${
+                        onClick={() => { playButtonClick(); setTargetScore(s); }}
+                        className={`flex-1 py-3 rounded-xl font-bold text-lg transition-all ${
                           targetScore === s
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white glow-purple'
+                            : 'glass text-gray-400 hover:bg-white/5'
                         }`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                       >
                         {s}점
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
@@ -340,27 +367,31 @@ export default function GameSetupPage() {
                   <label className="text-sm text-gray-400 block mb-2">제한 시간</label>
                   <div className="flex flex-wrap gap-2">
                     {TIMER_OPTIONS.map((t) => (
-                      <button
+                      <motion.button
                         key={t}
-                        onClick={() => setTimerSeconds(t)}
-                        className={`px-4 py-3 rounded-xl font-bold ${
+                        onClick={() => { playButtonClick(); setTimerSeconds(t); }}
+                        className={`px-5 py-3 rounded-xl font-bold transition-all ${
                           timerSeconds === t
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white glow-purple'
+                            : 'glass text-gray-400 hover:bg-white/5'
                         }`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                       >
                         {t}초
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
 
-                <button
-                  onClick={() => setStep(4)}
-                  className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl"
+                <motion.button
+                  onClick={() => handleStepChange(4)}
+                  className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-xl"
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
                 >
                   다음
-                </button>
+                </motion.button>
               </motion.div>
             )}
 
@@ -370,53 +401,54 @@ export default function GameSetupPage() {
                 initial={{ x: 50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -50, opacity: 0 }}
-                className="flex flex-col gap-4"
+                className="flex flex-col gap-5"
               >
                 <h2 className="text-xl font-bold text-white">팀 이름 설정</h2>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-blue-900/20 border border-blue-700/40 rounded-xl p-4">
+                  <div className="glass-blue rounded-xl p-5">
                     <span className="text-3xl">🐲</span>
                     <input
                       value={teamAName}
                       onChange={(e) => setTeamAName(e.target.value)}
-                      className="mt-2 w-full bg-transparent text-xl font-bold text-blue-400 border-b border-blue-600 outline-none"
+                      className="mt-2 w-full bg-transparent text-xl font-bold text-blue-400 border-b border-blue-600/50 outline-none focus:border-blue-400 transition-colors"
                     />
                   </div>
-                  <div className="bg-amber-900/20 border border-amber-700/40 rounded-xl p-4">
+                  <div className="glass-amber rounded-xl p-5">
                     <span className="text-3xl">🐯</span>
                     <input
                       value={teamBName}
                       onChange={(e) => setTeamBName(e.target.value)}
-                      className="mt-2 w-full bg-transparent text-xl font-bold text-amber-400 border-b border-amber-600 outline-none"
+                      className="mt-2 w-full bg-transparent text-xl font-bold text-amber-400 border-b border-amber-600/50 outline-none focus:border-amber-400 transition-colors"
                     />
                   </div>
                 </div>
 
-                <div className="bg-gray-800/60 rounded-xl p-4 border border-gray-700/50">
-                  <h3 className="text-sm text-gray-400 mb-2">게임 요약</h3>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="text-gray-500">학생 수</div>
-                    <div className="text-white font-bold">{students.length}명</div>
-                    <div className="text-gray-500">학년/과목</div>
-                    <div className="text-white font-bold">{grade}학년 {subject}</div>
-                    <div className="text-gray-500">단원</div>
-                    <div className="text-white font-bold text-xs">{unit}</div>
-                    <div className="text-gray-500">목표 점수</div>
-                    <div className="text-white font-bold">{targetScore}점</div>
-                    <div className="text-gray-500">제한 시간</div>
-                    <div className="text-white font-bold">{timerSeconds}초</div>
+                <div className="glass-strong rounded-xl p-5">
+                  <h3 className="text-sm text-gray-400 mb-3 uppercase tracking-wider font-medium">게임 요약</h3>
+                  <div className="grid grid-cols-2 gap-y-2.5 gap-x-4 text-sm">
+                    <span className="text-gray-500">학생 수</span>
+                    <span className="text-white font-bold">{students.length}명</span>
+                    <span className="text-gray-500">학년/과목</span>
+                    <span className="text-white font-bold">{grade}학년 {subject}</span>
+                    <span className="text-gray-500">단원</span>
+                    <span className="text-white font-bold text-xs leading-relaxed">{unit}</span>
+                    <span className="text-gray-500">목표 점수</span>
+                    <span className="text-white font-bold">{targetScore}점</span>
+                    <span className="text-gray-500">제한 시간</span>
+                    <span className="text-white font-bold">{timerSeconds}초</span>
                   </div>
                 </div>
 
                 <motion.button
                   onClick={handleStart}
-                  className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-2xl font-black text-2xl"
+                  className="w-full py-4 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-600 hover:from-purple-500 hover:via-purple-400 hover:to-pink-500 text-white rounded-2xl font-black text-2xl transition-shadow hover:shadow-lg hover:shadow-purple-500/20 flex items-center justify-center gap-3"
                   style={{ fontFamily: "var(--font-heading), sans-serif" }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  🎮 게임 시작!
+                  <Gamepad2 className="w-7 h-7" />
+                  게임 시작!
                 </motion.button>
               </motion.div>
             )}

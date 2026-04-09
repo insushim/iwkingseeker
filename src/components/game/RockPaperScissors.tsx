@@ -2,27 +2,41 @@
 
 import { motion } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
-import { playCorrectSound } from '@/lib/sounds';
-import { Crown } from 'lucide-react';
+import { playRPSReveal, playRPSBeat } from '@/lib/sounds';
+import { Crown, Zap } from 'lucide-react';
+import { useState } from 'react';
 
 export default function RockPaperScissors() {
   const { teamA, teamB, setRPSResult } = useGameStore();
+  const [selecting, setSelecting] = useState(false);
 
   const handleSelectWinner = (winner: 'team_a' | 'team_b') => {
-    playCorrectSound();
-    setRPSResult(winner);
+    if (selecting) return;
+    setSelecting(true);
+    playRPSBeat();
+
+    setTimeout(() => {
+      playRPSReveal();
+      setRPSResult(winner);
+    }, 400);
   };
 
   return (
     <div className="flex flex-col items-center gap-8 w-full">
-      <motion.h2
-        className="text-3xl font-black text-white"
-        style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+      <motion.div
+        className="flex items-center gap-3"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
       >
-        가위바위보!
-      </motion.h2>
+        <Zap className="w-8 h-8 text-yellow-400" />
+        <h2
+          className="text-4xl font-black text-white"
+          style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+        >
+          가위바위보!
+        </h2>
+        <Zap className="w-8 h-8 text-yellow-400" />
+      </motion.div>
 
       <motion.p
         className="text-lg text-gray-300"
@@ -34,45 +48,79 @@ export default function RockPaperScissors() {
       </motion.p>
 
       <div className="flex items-center gap-8">
+        {/* Team A */}
         <motion.button
-          className="flex flex-col items-center gap-4 px-12 py-8 bg-blue-900/40 border-2 border-blue-600/50 rounded-2xl hover:bg-blue-800/60 hover:border-blue-400 transition-all"
+          className="group flex flex-col items-center gap-4 px-12 py-8 glass-blue rounded-2xl transition-all hover:bg-blue-500/15"
           onClick={() => handleSelectWinner('team_a')}
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.05, y: -4 }}
           whileTap={{ scale: 0.95 }}
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
+          disabled={selecting}
         >
-          <span className="text-5xl">🐲</span>
-          <span className="text-2xl font-black text-blue-400">{teamA.name}</span>
-          <div className="flex items-center gap-2 text-yellow-400">
-            <Crown className="w-5 h-5" />
+          <motion.span
+            className="text-6xl"
+            animate={{ rotate: [0, -5, 5, 0] }}
+            transition={{ repeat: Infinity, duration: 3 }}
+          >
+            🐲
+          </motion.span>
+          <span
+            className="text-2xl font-black text-blue-400"
+            style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+          >
+            {teamA.name}
+          </span>
+          <div className="flex items-center gap-2 text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Crown className="w-5 h-5" style={{ filter: 'drop-shadow(0 0 4px rgba(250,204,21,0.5))' }} />
             <span className="font-bold">승리!</span>
           </div>
         </motion.button>
 
-        <motion.span
-          className="text-4xl font-bold text-gray-500"
+        {/* VS */}
+        <motion.div
+          className="flex flex-col items-center gap-2"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.4 }}
         >
-          VS
-        </motion.span>
+          <motion.span
+            className="text-4xl font-black text-gradient-fire"
+            style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+          >
+            VS
+          </motion.span>
+        </motion.div>
 
+        {/* Team B */}
         <motion.button
-          className="flex flex-col items-center gap-4 px-12 py-8 bg-amber-900/40 border-2 border-amber-600/50 rounded-2xl hover:bg-amber-800/60 hover:border-amber-400 transition-all"
+          className="group flex flex-col items-center gap-4 px-12 py-8 glass-amber rounded-2xl transition-all hover:bg-amber-500/15"
           onClick={() => handleSelectWinner('team_b')}
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.05, y: -4 }}
           whileTap={{ scale: 0.95 }}
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
+          disabled={selecting}
         >
-          <span className="text-5xl">🐯</span>
-          <span className="text-2xl font-black text-amber-400">{teamB.name}</span>
-          <div className="flex items-center gap-2 text-yellow-400">
-            <Crown className="w-5 h-5" />
+          <motion.span
+            className="text-6xl"
+            animate={{ rotate: [0, 5, -5, 0] }}
+            transition={{ repeat: Infinity, duration: 3 }}
+          >
+            🐯
+          </motion.span>
+          <span
+            className="text-2xl font-black text-amber-400"
+            style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+          >
+            {teamB.name}
+          </span>
+          <div className="flex items-center gap-2 text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Crown className="w-5 h-5" style={{ filter: 'drop-shadow(0 0 4px rgba(250,204,21,0.5))' }} />
             <span className="font-bold">승리!</span>
           </div>
         </motion.button>

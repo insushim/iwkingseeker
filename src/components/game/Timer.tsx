@@ -13,7 +13,7 @@ interface TimerProps {
 
 export default function Timer({ seconds, isActive, onTimeUp, size = 80 }: TimerProps) {
   const [timeLeft, setTimeLeft] = useState(seconds);
-  const radius = (size - 8) / 2;
+  const radius = (size - 10) / 2;
   const circumference = 2 * Math.PI * radius;
   const progress = timeLeft / seconds;
   const strokeDashoffset = circumference * (1 - progress);
@@ -50,48 +50,89 @@ export default function Timer({ seconds, isActive, onTimeUp, size = 80 }: TimerP
     return () => clearInterval(interval);
   }, [isActive, timeLeft, handleTimeUp]);
 
-  const color =
-    timeLeft > seconds * 0.5
-      ? '#22c55e'
-      : timeLeft > seconds * 0.25
-        ? '#eab308'
-        : '#ef4444';
+  const isWarning = timeLeft <= 5;
+  const isCritical = timeLeft <= 3;
+
+  const color = timeLeft > seconds * 0.5
+    ? '#22c55e'
+    : timeLeft > seconds * 0.25
+      ? '#eab308'
+      : '#ef4444';
+
+  const glowColor = timeLeft > seconds * 0.5
+    ? 'rgba(34,197,94,0.3)'
+    : timeLeft > seconds * 0.25
+      ? 'rgba(234,179,8,0.3)'
+      : 'rgba(239,68,68,0.5)';
 
   return (
-    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        className="-rotate-90"
-      >
+    <div
+      className="relative inline-flex items-center justify-center"
+      style={{ width: size, height: size }}
+    >
+      {/* Outer glow ring */}
+      <motion.div
+        className="absolute inset-0 rounded-full"
+        animate={isWarning ? {
+          boxShadow: [
+            `0 0 10px ${glowColor}`,
+            `0 0 25px ${glowColor}`,
+            `0 0 10px ${glowColor}`,
+          ],
+        } : {
+          boxShadow: `0 0 8px ${glowColor}`,
+        }}
+        transition={isWarning ? { duration: 0.5, repeat: Infinity } : { duration: 1 }}
+      />
+
+      <svg width={size} height={size} className="-rotate-90">
+        {/* Background track */}
         <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#374151"
-          strokeWidth="4"
+          stroke="rgba(255,255,255,0.06)"
+          strokeWidth="5"
         />
+        {/* Progress ring */}
         <motion.circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           fill="none"
           stroke={color}
-          strokeWidth="4"
+          strokeWidth="5"
           strokeLinecap="round"
           strokeDasharray={circumference}
           animate={{ strokeDashoffset }}
           transition={{ duration: 0.5, ease: 'linear' }}
+          style={{
+            filter: `drop-shadow(0 0 6px ${glowColor})`,
+          }}
         />
       </svg>
+
       <motion.span
-        className="absolute text-xl font-black text-white"
-        animate={timeLeft <= 5 ? { scale: [1, 1.2, 1] } : {}}
-        transition={{ duration: 0.3 }}
+        className="absolute font-black text-white"
+        style={{
+          fontSize: size * 0.3,
+          textShadow: isWarning ? `0 0 10px ${glowColor}` : undefined,
+        }}
+        animate={isCritical ? { scale: [1, 1.3, 1] } : isWarning ? { scale: [1, 1.15, 1] } : {}}
+        transition={{ duration: isCritical ? 0.3 : 0.5 }}
       >
         {timeLeft}
       </motion.span>
+
+      {/* Critical pulse ring */}
+      {isCritical && (
+        <motion.div
+          className="absolute inset-0 rounded-full border-2 border-red-500/50"
+          animate={{ scale: [1, 1.3], opacity: [0.8, 0] }}
+          transition={{ duration: 0.8, repeat: Infinity }}
+        />
+      )}
     </div>
   );
 }

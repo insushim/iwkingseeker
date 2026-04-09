@@ -4,7 +4,8 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import CrownAnimation from './CrownAnimation';
-import { playKingFoundSound } from '@/lib/sounds';
+import { playKingFoundSound, playWrongSound } from '@/lib/sounds';
+import { ShieldX, ArrowRight } from 'lucide-react';
 
 export default function RoundResult() {
   const {
@@ -18,6 +19,8 @@ export default function RoundResult() {
   useEffect(() => {
     if (lastGuessResult === 'found') {
       playKingFoundSound();
+    } else if (lastGuessResult === 'not_found') {
+      playWrongSound();
     }
   }, [lastGuessResult]);
 
@@ -38,34 +41,55 @@ export default function RoundResult() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
+      {/* Not found animation */}
       <motion.div
-        className="text-8xl"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring' }}
+        className="relative"
+        initial={{ scale: 0, rotate: -15 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ type: 'spring', stiffness: 200 }}
       >
-        ❌
+        <div className="p-6 rounded-full glass-strong glow-red">
+          <ShieldX className="w-16 h-16 text-red-400" />
+        </div>
+
+        {/* Shake effect ring */}
+        <motion.div
+          className="absolute inset-0 rounded-full border-2 border-red-500/30"
+          animate={{ scale: [1, 1.2], opacity: [0.6, 0] }}
+          transition={{ duration: 1, repeat: 2 }}
+        />
       </motion.div>
 
       <h2
         className="text-3xl font-black text-gray-300"
-        style={{ fontFamily: "'Black Han Sans', sans-serif" }}
+        style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
       >
         왕이 아닙니다!
       </h2>
 
-      <p className="text-xl text-gray-400">
-        <span className="text-white font-bold">{lastGuessedStudent}</span> 학생은 왕이 아닙니다.
-        게임을 계속합니다!
-      </p>
+      <motion.div
+        className="glass rounded-xl px-6 py-3"
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        <p className="text-lg text-gray-400">
+          <span className="text-white font-bold">{lastGuessedStudent}</span> 학생은 왕이 아닙니다.
+        </p>
+      </motion.div>
 
       <motion.button
-        className="px-8 py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-2xl font-bold text-lg"
+        className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-2xl font-black text-lg transition-shadow hover:shadow-lg hover:shadow-purple-500/20"
+        style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
         onClick={() => setPhase('QUIZ')}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5 }}
       >
-        다음 문제로!
+        다음 문제로
+        <ArrowRight className="w-5 h-5" />
       </motion.button>
     </motion.div>
   );

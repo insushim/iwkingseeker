@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import StudentCard from './StudentCard';
-import { EyeOff, Crown, Check } from 'lucide-react';
+import { playKingSelectSuspense, playTeamSelect } from '@/lib/sounds';
+import { EyeOff, Crown, Check, Lock } from 'lucide-react';
 
 interface KingSelectorProps {
   selectingTeam: 'team_a' | 'team_b';
@@ -18,6 +19,15 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
   const selectingTeamData = selectingTeam === 'team_a' ? teamA : teamB;
   const targetTeamData = selectingTeam === 'team_a' ? teamB : teamA;
   const targetTeamKey: 'team_a' | 'team_b' = selectingTeam === 'team_a' ? 'team_b' : 'team_a';
+
+  useEffect(() => {
+    playKingSelectSuspense();
+  }, []);
+
+  const handleSelect = (student: string) => {
+    playTeamSelect();
+    setSelectedKing(student);
+  };
 
   const handleConfirm = () => {
     if (!selectedKing) return;
@@ -41,39 +51,54 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
         animate={{ opacity: 1 }}
       >
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring' }}
+          className="p-6 rounded-full glass-strong glow-yellow"
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 200 }}
         >
-          <Crown className="w-20 h-20 text-yellow-400" />
+          <Crown
+            className="w-16 h-16 text-yellow-400"
+            style={{ filter: 'drop-shadow(0 0 15px rgba(250,204,21,0.5))' }}
+          />
         </motion.div>
         <h2
-          className="text-3xl font-black text-yellow-400"
-          style={{ fontFamily: "'Black Han Sans', sans-serif" }}
+          className="text-3xl font-black text-gradient-gold"
+          style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
         >
-          왕이 선택되었습니다! (비밀)
+          왕이 선택되었습니다!
         </h2>
-        <p className="text-gray-400">다른 학생들은 누가 왕인지 모릅니다</p>
+        <div className="flex items-center gap-2 text-gray-400">
+          <Lock className="w-4 h-4" />
+          <p>다른 학생들은 누가 왕인지 모릅니다</p>
+        </div>
       </motion.div>
     );
   }
 
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-4xl mx-auto">
+      {/* Warning banner */}
       <motion.div
-        className="flex items-center gap-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-6 py-3"
+        className="flex items-center gap-3 glass rounded-xl px-6 py-3"
+        style={{ boxShadow: '0 0 20px rgba(250,204,21,0.1)' }}
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
       >
-        <EyeOff className="w-6 h-6 text-yellow-400" />
+        <motion.div
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ repeat: Infinity, duration: 1.5 }}
+        >
+          <EyeOff className="w-6 h-6 text-yellow-400" />
+        </motion.div>
         <span className="text-yellow-300 font-bold text-lg">
           다른 학생들은 눈을 감아주세요!
         </span>
       </motion.div>
 
+      {/* Title */}
       <motion.h2
         className="text-2xl font-black text-white text-center"
-        style={{ fontFamily: "'Black Han Sans', sans-serif" }}
+        style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
         initial={{ y: -10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
@@ -89,6 +114,7 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
         의 왕을 선택하세요
       </motion.h2>
 
+      {/* Student grid */}
       <div className="flex flex-wrap justify-center gap-3">
         <AnimatePresence>
           {targetTeamData.students.map((student, i) => (
@@ -96,7 +122,7 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
               key={student}
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: i * 0.05 }}
+              transition={{ delay: 0.3 + i * 0.05 }}
             >
               <StudentCard
                 name={student}
@@ -104,20 +130,24 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
                 size="lg"
                 isSelected={selectedKing === student}
                 showCrown={selectedKing === student}
-                onClick={() => setSelectedKing(student)}
+                onClick={() => handleSelect(student)}
               />
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
 
+      {/* Confirm button */}
       <motion.button
-        className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-white rounded-2xl font-black text-xl disabled:opacity-40 disabled:cursor-not-allowed"
-        style={{ fontFamily: "'Black Han Sans', sans-serif" }}
+        className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-white rounded-2xl font-black text-xl disabled:opacity-40 disabled:cursor-not-allowed transition-shadow hover:shadow-lg hover:shadow-yellow-500/20"
+        style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
         onClick={handleConfirm}
         disabled={!selectedKing}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5 }}
       >
         <Check className="w-6 h-6" />
         왕 선택 완료!
