@@ -94,8 +94,8 @@ export default function GameSetupPage() {
     const filtered = questionsSeed.filter(
       (q) => q.grade === grade && q.subject === subject && q.unit === unit
     );
-    const rawPool = filtered.map((q, i) => ({
-      id: `seed-${i}`,
+    const rawPool = filtered.map((q) => ({
+      id: `seed-${Math.random().toString(36).slice(2, 10)}`,
       grade: q.grade,
       subject: q.subject,
       unit: q.unit,
@@ -110,8 +110,9 @@ export default function GameSetupPage() {
       created_at: new Date().toISOString(),
     }));
 
-    // 주관식/빈칸 → 객관식 자동 변환
-    const pool = convertToMultipleChoice(rawPool);
+    // 주관식/빈칸 → 객관식 자동 변환 + 셔플
+    const converted = convertToMultipleChoice(rawPool);
+    const pool = converted.sort(() => Math.random() - 0.5);
 
     setQuestionPool(pool);
     initGame({
