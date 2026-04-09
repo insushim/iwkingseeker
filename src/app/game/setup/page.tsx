@@ -96,7 +96,7 @@ export default function GameSetupPage() {
       (q) => q.grade === grade && q.subject === subject && q.unit === unit
     );
     // 2순위: 같은 학년+과목의 다른 단원 문제 (풀이 적을 때 보충)
-    const MIN_POOL = 20;
+    const MIN_POOL = 50;
     let filtered = unitQuestions;
     if (unitQuestions.length < MIN_POOL) {
       const sameSubject = questionsSeed.filter(
