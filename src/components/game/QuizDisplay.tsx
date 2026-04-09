@@ -277,7 +277,7 @@ export default function QuizDisplay() {
             <p className="text-sm text-purple-400/80 mb-2 font-medium">
               {q.subject} &middot; {q.unit}
             </p>
-            <h3 className="text-3xl md:text-4xl font-bold text-white leading-relaxed">
+            <h3 className="text-4xl md:text-5xl font-bold text-white leading-relaxed">
               {q.question_text}
             </h3>
           </div>
@@ -341,7 +341,7 @@ export default function QuizDisplay() {
               <motion.button
                 key={i}
                 className={cn(
-                  'relative p-5 rounded-xl border text-left text-xl font-bold text-white transition-all overflow-hidden',
+                  'relative p-6 rounded-xl border text-left text-2xl md:text-3xl font-bold text-white transition-all overflow-hidden',
                   showResult && isThisCorrect ? 'bg-green-600 border-green-400/60 ring-2 ring-green-400/40 glow-green'
                     : showResult && isThisSelected && !isCorrect ? 'bg-red-600/80 border-red-400/40 glow-red'
                     : `${style.bg} ${style.glow}`,
@@ -354,7 +354,7 @@ export default function QuizDisplay() {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: i * 0.08 }}
               >
-                <span className="mr-3 text-2xl font-black opacity-40">{style.label}</span>
+                <span className="mr-4 text-4xl font-black opacity-40">{style.label}</span>
                 {option}
               </motion.button>
             );
@@ -371,7 +371,7 @@ export default function QuizDisplay() {
               <motion.button
                 key={i}
                 className={cn(
-                  'flex items-center gap-4 px-6 py-4 rounded-2xl border text-left text-xl font-bold text-white transition-all',
+                  'flex items-center gap-4 px-8 py-5 rounded-2xl border text-left text-2xl md:text-3xl font-bold text-white transition-all',
                   showResult && isThisCorrect ? 'bg-green-600 border-green-400/60 ring-2 ring-green-400/40 glow-green'
                     : showResult && isThisSelected && !isCorrect ? 'bg-red-600/80 border-red-400/40 glow-red'
                     : `${style.bg} ${style.glow}`,
@@ -384,7 +384,7 @@ export default function QuizDisplay() {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: i * 0.12, type: 'spring', stiffness: 200 }}
               >
-                <span className="text-3xl">{STYLE_EMOJIS[i]}</span>
+                <span className="text-4xl">{STYLE_EMOJIS[i]}</span>
                 <span className="flex-1">{option}</span>
               </motion.button>
             );
@@ -401,7 +401,7 @@ export default function QuizDisplay() {
               <motion.button
                 key={i}
                 className={cn(
-                  'relative flex flex-col items-center justify-center rounded-2xl border-2 text-center text-xl font-black text-white transition-all',
+                  'relative flex flex-col items-center justify-center rounded-2xl border-2 text-center text-2xl md:text-3xl font-black text-white transition-all',
                   showResult && isThisCorrect ? 'bg-green-600 border-green-400 ring-4 ring-green-400/30 glow-green'
                     : showResult && isThisSelected && !isCorrect ? 'bg-red-600/80 border-red-400 glow-red'
                     : `${style.bg} ${style.glow}`,
@@ -414,7 +414,7 @@ export default function QuizDisplay() {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: i * 0.1, type: 'spring' }}
               >
-                <span className="text-4xl mb-2 opacity-30">{style.label}</span>
+                <span className="text-5xl mb-2 opacity-30">{style.label}</span>
                 <span className="px-4 leading-snug">{option}</span>
               </motion.button>
             );
@@ -431,7 +431,7 @@ export default function QuizDisplay() {
               <motion.button
                 key={i}
                 className={cn(
-                  'relative flex items-center gap-3 px-5 py-4 rounded-xl border text-left text-lg font-bold text-white transition-all',
+                  'relative flex items-center gap-4 px-6 py-5 rounded-xl border text-left text-2xl md:text-3xl font-bold text-white transition-all',
                   showResult && isThisCorrect ? 'bg-green-600 border-green-400/60 ring-2 ring-green-400/40 glow-green'
                     : showResult && isThisSelected && !isCorrect ? 'bg-red-600/80 border-red-400/40 glow-red'
                     : `${style.bg} ${style.glow}`,
@@ -444,7 +444,7 @@ export default function QuizDisplay() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: i * 0.05 }}
               >
-                <span className="text-3xl font-black opacity-50 shrink-0 w-10 text-center">{i + 1}</span>
+                <span className="text-4xl font-black opacity-50 shrink-0 w-12 text-center">{i + 1}</span>
                 <span className="flex-1">{option}</span>
               </motion.button>
             );
