@@ -81,6 +81,7 @@ export type GamePhase =
   | 'KING_SELECT_B'
   | 'RPS'
   | 'QUIZ'
+  | 'WRONG_ANSWER'
   | 'GUESS_KING'
   | 'ROUND_RESULT'
   | 'NEW_ROUND'

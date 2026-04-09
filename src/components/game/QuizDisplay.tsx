@@ -129,10 +129,10 @@ export default function QuizDisplay() {
       else playWrongSound();
 
       setTimeout(() => {
-        submitAnswer(answer, correct);
         setSelectedAnswer(null);
         setShowResult(false);
-      }, 2500);
+        submitAnswer(answer, correct);
+      }, 2000);
     },
     [showResult, currentQuestion, submitAnswer]
   );

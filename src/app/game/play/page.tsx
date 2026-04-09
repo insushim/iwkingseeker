@@ -15,6 +15,7 @@ import RockPaperScissors from '@/components/game/RockPaperScissors';
 import QuizDisplay from '@/components/game/QuizDisplay';
 import KingGuess from '@/components/game/KingGuess';
 import RoundResult from '@/components/game/RoundResult';
+import WrongAnswer from '@/components/game/WrongAnswer';
 import GameOver from '@/components/game/GameOver';
 import { Maximize, Minimize, Volume2, VolumeX } from 'lucide-react';
 
@@ -76,7 +77,7 @@ export default function GamePlayPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [toggleFullscreen]);
 
-  const showScoreboard = !['SETUP', 'TEAM_SPLIT', 'GAME_OVER'].includes(phase);
+  const showScoreboard = !['SETUP', 'TEAM_SPLIT', 'GAME_OVER', 'WRONG_ANSWER'].includes(phase);
 
   return (
     <div className="h-screen bg-mesh bg-mesh-animated flex flex-col relative noise-overlay overflow-hidden">
@@ -121,13 +122,14 @@ export default function GamePlayPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.25 }}
-            className="w-full flex items-center justify-center"
+            className="w-full h-full flex items-center justify-center"
           >
             {phase === 'TEAM_SPLIT' && <TeamSplitter />}
             {phase === 'KING_SELECT_A' && <KingSelector selectingTeam="team_a" />}
             {phase === 'KING_SELECT_B' && <KingSelector selectingTeam="team_b" />}
             {phase === 'RPS' && <RockPaperScissors />}
             {phase === 'QUIZ' && <QuizDisplay />}
+            {phase === 'WRONG_ANSWER' && <WrongAnswer />}
             {phase === 'GUESS_KING' && <KingGuess />}
             {phase === 'ROUND_RESULT' && <RoundResult />}
             {phase === 'GAME_OVER' && <GameOver />}

@@ -130,6 +130,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
         currentRoundQuestions: [...state.currentRoundQuestions, record],
         currentAttacker: newAttacker,
         currentQuestion: null,
+        phase: 'WRONG_ANSWER',
         usedQuestionIds: state.currentQuestion
           ? [...state.usedQuestionIds, state.currentQuestion.id]
           : state.usedQuestionIds,
