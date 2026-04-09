@@ -1,30 +1,50 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import Timer from './Timer';
 import { playCorrectSound, playWrongSound } from '@/lib/sounds';
 import { cn } from '@/lib/utils';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Zap, HelpCircle } from 'lucide-react';
 
-const OPTION_STYLES = [
-  { bg: 'bg-red-600/80 hover:bg-red-500/90 border-red-400/40', glow: 'hover:shadow-red-500/20 hover:shadow-lg', icon: '1' },
-  { bg: 'bg-blue-600/80 hover:bg-blue-500/90 border-blue-400/40', glow: 'hover:shadow-blue-500/20 hover:shadow-lg', icon: '2' },
-  { bg: 'bg-green-600/80 hover:bg-green-500/90 border-green-400/40', glow: 'hover:shadow-green-500/20 hover:shadow-lg', icon: '3' },
-  { bg: 'bg-yellow-600/80 hover:bg-yellow-500/90 border-yellow-400/40', glow: 'hover:shadow-yellow-500/20 hover:shadow-lg', icon: '4' },
+/**
+ * 문제 표시 스타일:
+ * 'grid'    — 2x2 격자 (클래식)
+ * 'list'    — 세로 리스트 (순서대로 등장)
+ * 'bigcard' — 큰 카드 (한 줄씩 크게)
+ * 'speed'   — 스피드 퀴즈 (번호 대형)
+ */
+type QuizStyle = 'grid' | 'list' | 'bigcard' | 'speed';
+
+const STYLE_COLORS = [
+  { bg: 'bg-red-600/80 hover:bg-red-500/90 border-red-400/40', glow: 'hover:shadow-red-500/20 hover:shadow-lg', label: 'A' },
+  { bg: 'bg-blue-600/80 hover:bg-blue-500/90 border-blue-400/40', glow: 'hover:shadow-blue-500/20 hover:shadow-lg', label: 'B' },
+  { bg: 'bg-green-600/80 hover:bg-green-500/90 border-green-400/40', glow: 'hover:shadow-green-500/20 hover:shadow-lg', label: 'C' },
+  { bg: 'bg-yellow-600/80 hover:bg-yellow-500/90 border-yellow-400/40', glow: 'hover:shadow-yellow-500/20 hover:shadow-lg', label: 'D' },
 ];
+
+const STYLE_EMOJIS = ['🔴', '🔵', '🟢', '🟡'];
+
+function getChosung(str: string): string {
+  const cho = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  return [...str].map((ch) => {
+    const code = ch.charCodeAt(0) - 0xAC00;
+    if (code < 0 || code > 11171) return ch;
+    return cho[Math.floor(code / 588)] ?? ch;
+  }).join('');
+}
 
 function ResultOverlay({ isCorrect }: { isCorrect: boolean }) {
   const particles = useMemo(() =>
     isCorrect
-      ? Array.from({ length: 20 }, (_, i) => ({
+      ? Array.from({ length: 24 }, (_, i) => ({
           id: i,
-          x: (Math.random() - 0.5) * 400,
-          y: (Math.random() - 0.5) * 400,
+          x: (Math.random() - 0.5) * 500,
+          y: (Math.random() - 0.5) * 500,
           delay: Math.random() * 0.3,
-          size: 4 + Math.random() * 8,
-          color: ['#fbbf24', '#22c55e', '#3b82f6', '#a855f7'][i % 4],
+          size: 4 + Math.random() * 10,
+          color: ['#fbbf24', '#22c55e', '#3b82f6', '#a855f7', '#ec4899'][i % 5],
         }))
       : [],
     [isCorrect]
@@ -37,7 +57,6 @@ function ResultOverlay({ isCorrect }: { isCorrect: boolean }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Backdrop */}
       <motion.div
         className="absolute inset-0"
         style={{ background: isCorrect ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)' }}
@@ -45,11 +64,9 @@ function ResultOverlay({ isCorrect }: { isCorrect: boolean }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       />
-
-      {/* Result badge */}
       <motion.div
         className={cn(
-          'relative text-7xl font-black px-14 py-8 rounded-3xl',
+          'relative text-8xl font-black px-16 py-10 rounded-3xl',
           isCorrect
             ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white glow-green'
             : 'bg-gradient-to-br from-red-500 to-rose-600 text-white glow-red'
@@ -61,23 +78,13 @@ function ResultOverlay({ isCorrect }: { isCorrect: boolean }) {
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       >
         {isCorrect ? '정답!' : '오답!'}
-        {isCorrect && (
-          <Sparkles className="absolute -top-4 -right-4 w-10 h-10 text-yellow-300" />
-        )}
+        {isCorrect && <Sparkles className="absolute -top-5 -right-5 w-12 h-12 text-yellow-300" />}
       </motion.div>
-
-      {/* Celebration particles */}
       {particles.map((p) => (
         <motion.div
           key={p.id}
           className="absolute rounded-full"
-          style={{
-            width: p.size,
-            height: p.size,
-            backgroundColor: p.color,
-            left: '50%',
-            top: '50%',
-          }}
+          style={{ width: p.size, height: p.size, backgroundColor: p.color, left: '50%', top: '50%' }}
           initial={{ x: 0, y: 0, opacity: 1 }}
           animate={{ x: p.x, y: p.y, opacity: 0 }}
           transition={{ duration: 1, delay: p.delay, ease: 'easeOut' }}
@@ -88,20 +95,26 @@ function ResultOverlay({ isCorrect }: { isCorrect: boolean }) {
 }
 
 export default function QuizDisplay() {
-  const {
-    currentQuestion,
-    currentAttacker,
-    teamA,
-    teamB,
-    timerSeconds,
-    submitAnswer,
-  } = useGameStore();
+  const { currentQuestion, currentAttacker, teamA, teamB, timerSeconds, submitAnswer, totalQuestionsAsked } = useGameStore();
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   const attackerName = currentAttacker === 'team_a' ? teamA.name : teamB.name;
   const attackerEmoji = currentAttacker === 'team_a' ? '🐲' : '🐯';
+
+  // 문제마다 다른 스타일 - 문제 번호 기반으로 순환
+  const quizStyle: QuizStyle = useMemo(() => {
+    const styles: QuizStyle[] = ['grid', 'list', 'bigcard', 'speed'];
+    return styles[totalQuestionsAsked % styles.length]!;
+  }, [totalQuestionsAsked]);
+
+  // 초성 힌트
+  const chosungHint = useMemo(() => {
+    if (!currentQuestion) return '';
+    return getChosung(currentQuestion.correct_answer);
+  }, [currentQuestion]);
 
   const handleAnswer = useCallback(
     (answer: string) => {
@@ -110,12 +123,10 @@ export default function QuizDisplay() {
       setSelectedAnswer(answer);
       setIsCorrect(correct);
       setShowResult(true);
+      setShowHint(false);
 
-      if (correct) {
-        playCorrectSound();
-      } else {
-        playWrongSound();
-      }
+      if (correct) playCorrectSound();
+      else playWrongSound();
 
       setTimeout(() => {
         submitAnswer(answer, correct);
@@ -127,23 +138,23 @@ export default function QuizDisplay() {
   );
 
   const handleTimeUp = useCallback(() => {
-    if (!showResult) {
-      handleAnswer('__timeout__');
-    }
+    if (!showResult) handleAnswer('__timeout__');
   }, [showResult, handleAnswer]);
 
   if (!currentQuestion) return null;
 
+  const isOX = currentQuestion.question_type === 'ox';
+  const options = currentQuestion.options ?? [];
+  const styleLabel = isOX ? 'OX' : quizStyle === 'grid' ? '4지선다' : quizStyle === 'list' ? '리스트' : quizStyle === 'bigcard' ? '카드' : '스피드';
+
   return (
-    <div className="flex flex-col items-center gap-6 w-full">
-      {/* Top bar: Attacker + Timer */}
+    <div className="flex flex-col gap-4 w-full h-full">
+      {/* Top bar */}
       <div className="flex items-center justify-between w-full">
         <motion.div
           className={cn(
             'flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-lg glass',
-            currentAttacker === 'team_a'
-              ? 'text-blue-400 glass-blue'
-              : 'text-amber-400 glass-amber'
+            currentAttacker === 'team_a' ? 'text-blue-400 glass-blue' : 'text-amber-400 glass-amber'
           )}
           animate={{ scale: [1, 1.03, 1] }}
           transition={{ repeat: Infinity, duration: 2 }}
@@ -152,48 +163,108 @@ export default function QuizDisplay() {
           <span>공격: {attackerName}</span>
         </motion.div>
 
-        <Timer
-          key={currentQuestion.id}
-          seconds={timerSeconds}
-          isActive={!showResult}
-          onTimeUp={handleTimeUp}
-          size={75}
-        />
+        <div className="flex items-center gap-3">
+          {/* 스타일 뱃지 */}
+          <span className="text-xs text-purple-400/60 glass px-2 py-1 rounded-lg">
+            {styleLabel}
+          </span>
+          {/* 초성 힌트 버튼 */}
+          {!isOX && !showHint && !showResult && (
+            <motion.button
+              onClick={() => setShowHint(true)}
+              className="flex items-center gap-1 px-3 py-1.5 glass text-yellow-400/70 hover:text-yellow-400 rounded-lg text-sm transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <HelpCircle className="w-4 h-4" />
+              힌트
+            </motion.button>
+          )}
+          <Timer key={currentQuestion.id} seconds={timerSeconds} isActive={!showResult} onTimeUp={handleTimeUp} size={70} />
+        </div>
       </div>
 
       {/* Question card */}
       <motion.div
-        className="w-full glass-strong rounded-2xl p-8 relative overflow-hidden"
+        className="w-full glass-strong rounded-2xl p-6 relative overflow-hidden"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
+        key={currentQuestion.id + '-q'}
       >
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 opacity-60" />
-        <p className="text-sm text-purple-400/80 mb-3 font-medium">
-          {currentQuestion.subject} &middot; {currentQuestion.unit}
-        </p>
-        <h3 className="text-3xl md:text-4xl font-bold text-white leading-relaxed">
-          {currentQuestion.question_text}
-        </h3>
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 opacity-60" />
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <p className="text-sm text-purple-400/80 mb-2 font-medium">
+              {currentQuestion.subject} &middot; {currentQuestion.unit}
+            </p>
+            <h3 className="text-3xl md:text-4xl font-bold text-white leading-relaxed">
+              {currentQuestion.question_text}
+            </h3>
+          </div>
+          {quizStyle === 'speed' && !isOX && (
+            <motion.div
+              className="shrink-0 flex items-center gap-1 text-yellow-400"
+              animate={{ scale: [1, 1.15, 1] }}
+              transition={{ repeat: Infinity, duration: 0.8 }}
+            >
+              <Zap className="w-8 h-8" />
+              <span className="text-xl font-black">SPEED</span>
+            </motion.div>
+          )}
+        </div>
+        {/* 초성 힌트 */}
+        {showHint && (
+          <motion.p
+            className="mt-3 text-xl text-yellow-400/80 font-mono tracking-widest"
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            힌트: [ {chosungHint} ]
+          </motion.p>
+        )}
       </motion.div>
 
-      {/* Multiple choice */}
-      {currentQuestion.question_type === 'multiple_choice' && currentQuestion.options && (
-        <div className="grid grid-cols-2 gap-4 w-full">
-          {currentQuestion.options.map((option, i) => {
-            const style = OPTION_STYLES[i]!;
+      {/* Answer options */}
+      {isOX ? (
+        <div className="flex gap-6 w-full justify-center flex-1 items-center">
+          {['O', 'X'].map((choice) => {
+            const isThisCorrect = choice === currentQuestion.correct_answer;
+            const isThisSelected = choice === selectedAnswer;
+            return (
+              <motion.button
+                key={choice}
+                className={cn(
+                  'w-40 h-40 rounded-full text-8xl font-black border-4 transition-all',
+                  showResult && isThisCorrect ? 'bg-green-600 border-green-400 glow-green'
+                    : showResult && isThisSelected && !isCorrect ? 'bg-red-600/80 border-red-400 glow-red'
+                    : choice === 'O' ? 'bg-blue-600/70 hover:bg-blue-500/80 border-blue-400/40 hover:shadow-lg hover:shadow-blue-500/20'
+                    : 'bg-red-600/70 hover:bg-red-500/80 border-red-400/40 hover:shadow-lg hover:shadow-red-500/20',
+                  showResult && 'pointer-events-none'
+                )}
+                onClick={() => handleAnswer(choice)}
+                whileHover={!showResult ? { scale: 1.15 } : {}}
+                whileTap={!showResult ? { scale: 0.9 } : {}}
+              >
+                {choice}
+              </motion.button>
+            );
+          })}
+        </div>
+      ) : quizStyle === 'grid' ? (
+        /* 클래식 2x2 격자 */
+        <div className="grid grid-cols-2 gap-3 w-full flex-1">
+          {options.map((option, i) => {
+            const style = STYLE_COLORS[i]!;
             const isThisCorrect = option === currentQuestion.correct_answer;
             const isThisSelected = option === selectedAnswer;
-
             return (
               <motion.button
                 key={i}
                 className={cn(
-                  'relative p-6 rounded-xl border text-left text-xl font-bold text-white transition-all overflow-hidden',
-                  showResult && isThisCorrect
-                    ? 'bg-green-600 border-green-400/60 ring-2 ring-green-400/40 glow-green'
-                    : showResult && isThisSelected && !isCorrect
-                      ? 'bg-red-600/80 border-red-400/40 glow-red'
-                      : `${style.bg} ${style.glow}`,
+                  'relative p-5 rounded-xl border text-left text-xl font-bold text-white transition-all overflow-hidden',
+                  showResult && isThisCorrect ? 'bg-green-600 border-green-400/60 ring-2 ring-green-400/40 glow-green'
+                    : showResult && isThisSelected && !isCorrect ? 'bg-red-600/80 border-red-400/40 glow-red'
+                    : `${style.bg} ${style.glow}`,
                   showResult && 'pointer-events-none'
                 )}
                 onClick={() => handleAnswer(option)}
@@ -203,60 +274,110 @@ export default function QuizDisplay() {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: i * 0.08 }}
               >
-                <span className="mr-3 text-2xl font-black opacity-40">{style.icon}</span>
+                <span className="mr-3 text-2xl font-black opacity-40">{style.label}</span>
                 {option}
               </motion.button>
             );
           })}
         </div>
-      )}
-
-      {/* O/X */}
-      {currentQuestion.question_type === 'ox' && (
-        <div className="flex gap-8 w-full justify-center">
-          {['O', 'X'].map((choice) => {
-            const isThisCorrect = choice === currentQuestion.correct_answer;
-            const isThisSelected = choice === selectedAnswer;
-
+      ) : quizStyle === 'list' ? (
+        /* 세로 리스트 — 순서대로 슬라이드 */
+        <div className="flex flex-col gap-3 w-full flex-1 justify-center">
+          {options.map((option, i) => {
+            const style = STYLE_COLORS[i]!;
+            const isThisCorrect = option === currentQuestion.correct_answer;
+            const isThisSelected = option === selectedAnswer;
             return (
               <motion.button
-                key={choice}
+                key={i}
                 className={cn(
-                  'w-36 h-36 rounded-full text-7xl font-black border-4 transition-all',
-                  showResult && isThisCorrect
-                    ? 'bg-green-600 border-green-400 glow-green'
-                    : showResult && isThisSelected && !isCorrect
-                      ? 'bg-red-600/80 border-red-400 glow-red'
-                      : choice === 'O'
-                        ? 'bg-blue-600/70 hover:bg-blue-500/80 border-blue-400/40 hover:shadow-lg hover:shadow-blue-500/20'
-                        : 'bg-red-600/70 hover:bg-red-500/80 border-red-400/40 hover:shadow-lg hover:shadow-red-500/20',
+                  'flex items-center gap-4 px-6 py-4 rounded-2xl border text-left text-xl font-bold text-white transition-all',
+                  showResult && isThisCorrect ? 'bg-green-600 border-green-400/60 ring-2 ring-green-400/40 glow-green'
+                    : showResult && isThisSelected && !isCorrect ? 'bg-red-600/80 border-red-400/40 glow-red'
+                    : `${style.bg} ${style.glow}`,
                   showResult && 'pointer-events-none'
                 )}
-                onClick={() => handleAnswer(choice)}
-                whileHover={!showResult ? { scale: 1.1 } : {}}
-                whileTap={!showResult ? { scale: 0.9 } : {}}
+                onClick={() => handleAnswer(option)}
+                whileHover={!showResult ? { scale: 1.01, x: 8 } : {}}
+                whileTap={!showResult ? { scale: 0.98 } : {}}
+                initial={{ x: -60, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: i * 0.12, type: 'spring', stiffness: 200 }}
               >
-                {choice}
+                <span className="text-3xl">{STYLE_EMOJIS[i]}</span>
+                <span className="flex-1">{option}</span>
+              </motion.button>
+            );
+          })}
+        </div>
+      ) : quizStyle === 'bigcard' ? (
+        /* 빅카드 — 큰 카드 2x2지만 더 두꺼운 스타일 */
+        <div className="grid grid-cols-2 gap-4 w-full flex-1">
+          {options.map((option, i) => {
+            const style = STYLE_COLORS[i]!;
+            const isThisCorrect = option === currentQuestion.correct_answer;
+            const isThisSelected = option === selectedAnswer;
+            return (
+              <motion.button
+                key={i}
+                className={cn(
+                  'relative flex flex-col items-center justify-center rounded-2xl border-2 text-center text-xl font-black text-white transition-all',
+                  showResult && isThisCorrect ? 'bg-green-600 border-green-400 ring-4 ring-green-400/30 glow-green'
+                    : showResult && isThisSelected && !isCorrect ? 'bg-red-600/80 border-red-400 glow-red'
+                    : `${style.bg} ${style.glow}`,
+                  showResult && 'pointer-events-none'
+                )}
+                onClick={() => handleAnswer(option)}
+                whileHover={!showResult ? { scale: 1.03 } : {}}
+                whileTap={!showResult ? { scale: 0.97 } : {}}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: i * 0.1, type: 'spring' }}
+              >
+                <span className="text-4xl mb-2 opacity-30">{style.label}</span>
+                <span className="px-4 leading-snug">{option}</span>
+              </motion.button>
+            );
+          })}
+        </div>
+      ) : (
+        /* 스피드 — 번호 대형 + 긴급한 느낌 */
+        <div className="grid grid-cols-2 gap-3 w-full flex-1">
+          {options.map((option, i) => {
+            const style = STYLE_COLORS[i]!;
+            const isThisCorrect = option === currentQuestion.correct_answer;
+            const isThisSelected = option === selectedAnswer;
+            return (
+              <motion.button
+                key={i}
+                className={cn(
+                  'relative flex items-center gap-3 px-5 py-4 rounded-xl border text-left text-lg font-bold text-white transition-all',
+                  showResult && isThisCorrect ? 'bg-green-600 border-green-400/60 ring-2 ring-green-400/40 glow-green'
+                    : showResult && isThisSelected && !isCorrect ? 'bg-red-600/80 border-red-400/40 glow-red'
+                    : `${style.bg} ${style.glow}`,
+                  showResult && 'pointer-events-none'
+                )}
+                onClick={() => handleAnswer(option)}
+                whileHover={!showResult ? { scale: 1.02 } : {}}
+                whileTap={!showResult ? { scale: 0.98 } : {}}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <span className="text-3xl font-black opacity-50 shrink-0 w-10 text-center">{i + 1}</span>
+                <span className="flex-1">{option}</span>
               </motion.button>
             );
           })}
         </div>
       )}
 
-      {/* 주관식 제거됨 - 객관식과 OX만 지원 */}
-
       {/* Result overlay */}
-      <AnimatePresence>
-        {showResult && <ResultOverlay isCorrect={isCorrect} />}
-      </AnimatePresence>
+      <AnimatePresence>{showResult && <ResultOverlay isCorrect={isCorrect} />}</AnimatePresence>
 
       {/* Explanation */}
       {showResult && isCorrect && currentQuestion.explanation && (
-        <motion.div
-          className="w-full glass rounded-xl p-4"
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-        >
+        <motion.div className="w-full glass rounded-xl p-4" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
           <p className="text-sm text-gray-300 flex items-start gap-2">
             <Sparkles className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
             {currentQuestion.explanation}
@@ -267,9 +388,7 @@ export default function QuizDisplay() {
       {/* Teacher hint */}
       <div className="fixed bottom-2 left-2 z-50">
         <details className="cursor-pointer select-none">
-          <summary className="text-[10px] text-gray-700/50 hover:text-gray-500">
-            hint
-          </summary>
+          <summary className="text-[10px] text-gray-700/50 hover:text-gray-500">hint</summary>
           <p className="text-[11px] text-gray-500 bg-gray-900/95 px-2.5 py-1.5 rounded-lg mt-0.5 backdrop-blur-sm">
             {currentQuestion.correct_answer}
           </p>
