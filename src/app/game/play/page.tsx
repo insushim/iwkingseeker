@@ -74,7 +74,7 @@ export default function GamePlayPage() {
   return (
     <div className="min-h-screen bg-mesh bg-mesh-animated flex flex-col relative noise-overlay">
       {/* Top bar */}
-      <div className="relative z-10 flex items-center justify-between px-8 py-3">
+      <div className="relative z-10 flex items-center justify-between px-4 py-1">
         {showScoreboard ? (
           <motion.div
             className="flex-1"
@@ -102,7 +102,7 @@ export default function GamePlayPage() {
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-10 py-6">
+      <div className="relative z-10 flex-1 flex items-center justify-center px-4 py-2">
         <AnimatePresence mode="wait">
           <motion.div
             key={phase}
