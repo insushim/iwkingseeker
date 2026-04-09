@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import Timer from './Timer';
 import { playCorrectSound, playWrongSound } from '@/lib/sounds';
 import { cn } from '@/lib/utils';
-import { Sparkles, Zap, HelpCircle } from 'lucide-react';
+import { Sparkles, Zap, HelpCircle, ArrowRightLeft } from 'lucide-react';
 
 /**
  * 문제 표시 스타일:
@@ -100,6 +100,8 @@ export default function QuizDisplay() {
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [showTurnChange, setShowTurnChange] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState<{ answer: string; correct: boolean } | null>(null);
 
   const attackerName = currentAttacker === 'team_a' ? teamA.name : teamB.name;
   const attackerEmoji = currentAttacker === 'team_a' ? '🐲' : '🐯';
@@ -125,26 +127,104 @@ export default function QuizDisplay() {
       setShowResult(true);
       setShowHint(false);
 
-      if (correct) playCorrectSound();
-      else playWrongSound();
-
-      setTimeout(() => {
-        setSelectedAnswer(null);
-        setShowResult(false);
-        submitAnswer(answer, correct);
-      }, 2000);
+      if (correct) {
+        playCorrectSound();
+        setTimeout(() => {
+          setSelectedAnswer(null);
+          setShowResult(false);
+          submitAnswer(answer, true);
+        }, 2000);
+      } else {
+        playWrongSound();
+        // 오답: 2초 오답 표시 → 2초 공수교대 화면 → 새 문제
+        setTimeout(() => {
+          setShowResult(false);
+          setSelectedAnswer(null);
+          setShowTurnChange(true);
+          setPendingSubmit({ answer, correct: false });
+        }, 1500);
+      }
     },
     [showResult, currentQuestion, submitAnswer]
   );
 
   const handleTimeUp = useCallback(() => {
-    if (!showResult) handleAnswer('__timeout__');
-  }, [showResult, handleAnswer]);
+    if (!showResult && !showTurnChange) handleAnswer('__timeout__');
+  }, [showResult, showTurnChange, handleAnswer]);
 
-  if (!currentQuestion) return null;
+  // 공수교대 화면 2초 후 실제 제출
+  useEffect(() => {
+    if (!showTurnChange || !pendingSubmit) return;
+    const timer = setTimeout(() => {
+      setShowTurnChange(false);
+      submitAnswer(pendingSubmit.answer, pendingSubmit.correct);
+      setPendingSubmit(null);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [showTurnChange, pendingSubmit, submitAnswer]);
 
-  const isOX = currentQuestion.question_type === 'ox';
-  const options = currentQuestion.options ?? [];
+  if (!currentQuestion && !showTurnChange) return null;
+
+  // 공수 교대 화면
+  if (showTurnChange) {
+    const nextTeamName = currentAttacker === 'team_a' ? teamA.name : teamB.name;
+    const nextEmoji = currentAttacker === 'team_a' ? '🐲' : '🐯';
+    const nextColor = currentAttacker === 'team_a' ? 'text-blue-400' : 'text-amber-400';
+    return (
+      <div className="flex flex-col items-center justify-center gap-6 w-full h-full">
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+        >
+          <div className="p-8 rounded-full glass-strong" style={{ boxShadow: '0 0 40px rgba(147,51,234,0.3)' }}>
+            <ArrowRightLeft className="w-20 h-20 text-purple-400" />
+          </div>
+        </motion.div>
+        <motion.h2
+          className="text-6xl font-black text-white"
+          style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          공수 교대!
+        </motion.h2>
+        <motion.div
+          className="flex items-center gap-4 glass-strong rounded-2xl px-10 py-5"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <span className="text-6xl">{nextEmoji}</span>
+          <div>
+            <p className="text-gray-400 text-xl">다음 공격</p>
+            <p className={`text-4xl font-black ${nextColor}`}>{nextTeamName}</p>
+          </div>
+        </motion.div>
+        <motion.div
+          className="flex gap-2 mt-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+        >
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="w-3 h-3 rounded-full bg-purple-500"
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 1, repeat: Infinity, delay: i * 0.3 }}
+            />
+          ))}
+        </motion.div>
+      </div>
+    );
+  }
+
+  // showTurnChange이면 위에서 return됨. 여기 도달하면 currentQuestion은 반드시 존재
+  const q = currentQuestion!;
+  const isOX = q.question_type === 'ox';
+  const options = q.options ?? [];
   const styleLabel = isOX ? 'OX' : quizStyle === 'grid' ? '4지선다' : quizStyle === 'list' ? '리스트' : quizStyle === 'bigcard' ? '카드' : '스피드';
 
   return (
@@ -180,7 +260,7 @@ export default function QuizDisplay() {
               힌트
             </motion.button>
           )}
-          <Timer key={currentQuestion.id} seconds={timerSeconds} isActive={!showResult} onTimeUp={handleTimeUp} size={70} />
+          <Timer key={q.id} seconds={timerSeconds} isActive={!showResult} onTimeUp={handleTimeUp} size={70} />
         </div>
       </div>
 
@@ -189,16 +269,16 @@ export default function QuizDisplay() {
         className="w-full glass-strong rounded-2xl p-6 relative overflow-hidden"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        key={currentQuestion.id + '-q'}
+        key={q.id + '-q'}
       >
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 opacity-60" />
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <p className="text-sm text-purple-400/80 mb-2 font-medium">
-              {currentQuestion.subject} &middot; {currentQuestion.unit}
+              {q.subject} &middot; {q.unit}
             </p>
             <h3 className="text-3xl md:text-4xl font-bold text-white leading-relaxed">
-              {currentQuestion.question_text}
+              {q.question_text}
             </h3>
           </div>
           {quizStyle === 'speed' && !isOX && (
@@ -228,7 +308,7 @@ export default function QuizDisplay() {
       {isOX ? (
         <div className="flex gap-6 w-full justify-center flex-1 items-center">
           {['O', 'X'].map((choice) => {
-            const isThisCorrect = choice === currentQuestion.correct_answer;
+            const isThisCorrect = choice === q.correct_answer;
             const isThisSelected = choice === selectedAnswer;
             return (
               <motion.button
@@ -255,7 +335,7 @@ export default function QuizDisplay() {
         <div className="grid grid-cols-2 gap-3 w-full flex-1">
           {options.map((option, i) => {
             const style = STYLE_COLORS[i]!;
-            const isThisCorrect = option === currentQuestion.correct_answer;
+            const isThisCorrect = option === q.correct_answer;
             const isThisSelected = option === selectedAnswer;
             return (
               <motion.button
@@ -285,7 +365,7 @@ export default function QuizDisplay() {
         <div className="flex flex-col gap-3 w-full flex-1 justify-center">
           {options.map((option, i) => {
             const style = STYLE_COLORS[i]!;
-            const isThisCorrect = option === currentQuestion.correct_answer;
+            const isThisCorrect = option === q.correct_answer;
             const isThisSelected = option === selectedAnswer;
             return (
               <motion.button
@@ -315,7 +395,7 @@ export default function QuizDisplay() {
         <div className="grid grid-cols-2 gap-4 w-full flex-1">
           {options.map((option, i) => {
             const style = STYLE_COLORS[i]!;
-            const isThisCorrect = option === currentQuestion.correct_answer;
+            const isThisCorrect = option === q.correct_answer;
             const isThisSelected = option === selectedAnswer;
             return (
               <motion.button
@@ -345,7 +425,7 @@ export default function QuizDisplay() {
         <div className="grid grid-cols-2 gap-3 w-full flex-1">
           {options.map((option, i) => {
             const style = STYLE_COLORS[i]!;
-            const isThisCorrect = option === currentQuestion.correct_answer;
+            const isThisCorrect = option === q.correct_answer;
             const isThisSelected = option === selectedAnswer;
             return (
               <motion.button
@@ -376,11 +456,11 @@ export default function QuizDisplay() {
       <AnimatePresence>{showResult && <ResultOverlay isCorrect={isCorrect} />}</AnimatePresence>
 
       {/* Explanation */}
-      {showResult && isCorrect && currentQuestion.explanation && (
+      {showResult && isCorrect && q.explanation && (
         <motion.div className="w-full glass rounded-xl p-4" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
           <p className="text-sm text-gray-300 flex items-start gap-2">
             <Sparkles className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
-            {currentQuestion.explanation}
+            {q.explanation}
           </p>
         </motion.div>
       )}
@@ -390,7 +470,7 @@ export default function QuizDisplay() {
         <details className="cursor-pointer select-none">
           <summary className="text-[10px] text-gray-700/50 hover:text-gray-500">hint</summary>
           <p className="text-[11px] text-gray-500 bg-gray-900/95 px-2.5 py-1.5 rounded-lg mt-0.5 backdrop-blur-sm">
-            {currentQuestion.correct_answer}
+            {q.correct_answer}
           </p>
         </details>
       </div>
