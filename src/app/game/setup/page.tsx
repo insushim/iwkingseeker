@@ -7,6 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { GRADES, SUBJECTS, CURRICULUM_UNITS, TARGET_SCORES, TIMER_OPTIONS, TEAM_DEFAULTS } from '@/lib/constants';
 import { splitIntoTeams } from '@/lib/utils';
 import { playButtonClick, playPhaseTransition } from '@/lib/sounds';
+import { convertToMultipleChoice } from '@/lib/questionConverter';
 import { Crown, ChevronRight, Users, BookOpen, Settings, Play, Save, FolderOpen, Trash2, Check, Gamepad2 } from 'lucide-react';
 
 interface SavedClass {
@@ -93,7 +94,7 @@ export default function GameSetupPage() {
     const filtered = questionsSeed.filter(
       (q) => q.grade === grade && q.subject === subject && q.unit === unit
     );
-    const pool = filtered.map((q, i) => ({
+    const rawPool = filtered.map((q, i) => ({
       id: `seed-${i}`,
       grade: q.grade,
       subject: q.subject,
@@ -108,6 +109,9 @@ export default function GameSetupPage() {
       used_count: 0,
       created_at: new Date().toISOString(),
     }));
+
+    // 주관식/빈칸 → 객관식 자동 변환
+    const pool = convertToMultipleChoice(rawPool);
 
     setQuestionPool(pool);
     initGame({
