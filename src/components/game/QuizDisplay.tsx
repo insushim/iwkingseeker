@@ -260,7 +260,7 @@ export default function QuizDisplay() {
               힌트
             </motion.button>
           )}
-          <Timer key={q.id} seconds={timerSeconds} isActive={!showResult} onTimeUp={handleTimeUp} size={70} />
+          <Timer key={q.id} seconds={timerSeconds} isActive={!showResult && !showTurnChange} onTimeUp={handleTimeUp} size={70} />
         </div>
       </div>
 
