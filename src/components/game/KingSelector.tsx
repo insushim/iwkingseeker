@@ -17,8 +17,9 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
   const [confirmed, setConfirmed] = useState(false);
 
   const selectingTeamData = selectingTeam === 'team_a' ? teamA : teamB;
-  const targetTeamData = selectingTeam === 'team_a' ? teamB : teamA;
-  const targetTeamKey: 'team_a' | 'team_b' = selectingTeam === 'team_a' ? 'team_b' : 'team_a';
+  // 자기팀의 왕을 선택 (자기팀 학생 목록에서 왕을 고름)
+  const targetTeamData = selectingTeamData;
+  const targetTeamKey: 'team_a' | 'team_b' = selectingTeam;
 
   useEffect(() => {
     playKingSelectSuspense();
@@ -108,10 +109,7 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
         </span>
         {' '}대표 학생!
         <br />
-        <span className={selectingTeam === 'team_a' ? 'text-amber-400' : 'text-blue-400'}>
-          {targetTeamData.name}
-        </span>
-        의 왕을 선택하세요
+        우리 팀의 왕을 선택하세요
       </motion.h2>
 
       {/* Student grid */}
@@ -126,7 +124,7 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
             >
               <StudentCard
                 name={student}
-                teamColor={targetTeamKey === 'team_a' ? 'blue' : 'amber'}
+                teamColor={selectingTeam === 'team_a' ? 'blue' : 'amber'}
                 size="lg"
                 isSelected={selectedKing === student}
                 showCrown={selectedKing === student}
