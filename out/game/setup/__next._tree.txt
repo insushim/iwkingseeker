@@ -3,4 +3,4 @@
 :HL["/_next/static/css/7c203f5b4e3042de.css","style"]
 :HL["/_next/static/css/e7479b12d471d08d.css","style"]
 :HL["/_next/static/css/68c4213b226d1aee.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"game","param":null,"prefetchHints":0,"slots":{"children":{"name":"setup","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"BHSlpewX5TfD5iSC8LIE3"}
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"game","param":null,"prefetchHints":0,"slots":{"children":{"name":"setup","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"yaY4gKFEOn9c_czucjXYY"}
