@@ -37,7 +37,7 @@ export default function KingGuess() {
   const unrevealed = targetTeamData.students.filter((s) => !revealed.includes(s));
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-6xl mx-auto">
+    <div className="flex flex-col items-center gap-6 w-full w-full">
       {/* Header */}
       <motion.div
         className="flex items-center gap-3"

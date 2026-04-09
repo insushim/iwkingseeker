@@ -135,7 +135,7 @@ export default function QuizDisplay() {
   if (!currentQuestion) return null;
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-6xl mx-auto px-4">
+    <div className="flex flex-col items-center gap-6 w-full">
       {/* Top bar: Attacker + Timer */}
       <div className="flex items-center justify-between w-full">
         <motion.div

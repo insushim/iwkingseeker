@@ -77,7 +77,7 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-6xl mx-auto">
+    <div className="flex flex-col items-center gap-6 w-full w-full">
       {/* Warning banner */}
       <motion.div
         className="flex items-center gap-3 glass rounded-xl px-6 py-3"

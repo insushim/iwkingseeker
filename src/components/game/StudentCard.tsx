@@ -46,15 +46,15 @@ export default function StudentCard({
   size = 'md',
 }: StudentCardProps) {
   const sizeClasses = {
-    sm: 'px-3 py-2 text-sm gap-2',
-    md: 'px-4 py-3 text-base gap-2.5',
-    lg: 'px-5 py-3.5 text-lg gap-3',
+    sm: 'px-4 py-2.5 text-base gap-2.5',
+    md: 'px-5 py-3.5 text-lg gap-3',
+    lg: 'px-6 py-4 text-xl gap-3',
   };
 
   const avatarSizes = {
-    sm: 'w-6 h-6 text-[10px]',
-    md: 'w-8 h-8 text-xs',
-    lg: 'w-9 h-9 text-sm',
+    sm: 'w-7 h-7 text-xs',
+    md: 'w-9 h-9 text-sm',
+    lg: 'w-10 h-10 text-base',
   };
 
   const colorClasses = {

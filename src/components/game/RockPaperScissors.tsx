@@ -22,7 +22,7 @@ export default function RockPaperScissors() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-8 w-full">
+    <div className="flex flex-col items-center gap-10 w-full">
       <motion.div
         className="flex items-center gap-3"
         initial={{ y: -20, opacity: 0 }}
@@ -50,7 +50,7 @@ export default function RockPaperScissors() {
       <div className="flex items-center gap-8">
         {/* Team A */}
         <motion.button
-          className="group flex flex-col items-center gap-4 px-12 py-8 glass-blue rounded-2xl transition-all hover:bg-blue-500/15"
+          className="group flex flex-col items-center gap-4 px-16 py-10 glass-blue rounded-2xl transition-all hover:bg-blue-500/15"
           onClick={() => handleSelectWinner('team_a')}
           whileHover={{ scale: 1.05, y: -4 }}
           whileTap={{ scale: 0.95 }}
@@ -97,7 +97,7 @@ export default function RockPaperScissors() {
 
         {/* Team B */}
         <motion.button
-          className="group flex flex-col items-center gap-4 px-12 py-8 glass-amber rounded-2xl transition-all hover:bg-amber-500/15"
+          className="group flex flex-col items-center gap-4 px-16 py-10 glass-amber rounded-2xl transition-all hover:bg-amber-500/15"
           onClick={() => handleSelectWinner('team_b')}
           whileHover={{ scale: 1.05, y: -4 }}
           whileTap={{ scale: 0.95 }}

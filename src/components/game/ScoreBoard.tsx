@@ -97,7 +97,7 @@ function TeamScore({
       )}
 
       <motion.span
-        className="text-3xl relative z-10"
+        className="text-4xl relative z-10"
         animate={isActive ? { scale: [1, 1.1, 1] } : {}}
         transition={{ repeat: isActive ? Infinity : 0, duration: 1.5 }}
       >
@@ -105,7 +105,7 @@ function TeamScore({
       </motion.span>
 
       <div className="flex flex-col relative z-10">
-        <span className={cn('text-base font-bold', colorClass)}>{name}</span>
+        <span className={cn('text-xl font-bold', colorClass)}>{name}</span>
         <div className="flex items-center gap-1 mt-0.5">
           {Array.from({ length: targetScore }).map((_, i) => (
             <motion.div
@@ -129,7 +129,7 @@ function TeamScore({
             initial={{ y: -20, opacity: 0, scale: 0.5 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 20, opacity: 0, scale: 0.5 }}
-            className={cn('text-4xl font-black score-badge', colorClass)}
+            className={cn('text-5xl font-black score-badge', colorClass)}
             style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
           >
             {score}
