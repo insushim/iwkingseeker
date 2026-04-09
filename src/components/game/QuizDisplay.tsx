@@ -6,7 +6,7 @@ import { useGameStore } from '@/stores/gameStore';
 import Timer from './Timer';
 import { playCorrectSound, playWrongSound } from '@/lib/sounds';
 import { cn } from '@/lib/utils';
-import { Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 const OPTION_STYLES = [
   { bg: 'bg-red-600/80 hover:bg-red-500/90 border-red-400/40', glow: 'hover:shadow-red-500/20 hover:shadow-lg', icon: '1' },
@@ -132,27 +132,6 @@ export default function QuizDisplay() {
     }
   }, [showResult, handleAnswer]);
 
-  const handleTeacherJudge = useCallback(
-    (correct: boolean) => {
-      if (showResult || !currentQuestion) return;
-      setIsCorrect(correct);
-      setShowResult(true);
-
-      if (correct) {
-        playCorrectSound();
-      } else {
-        playWrongSound();
-      }
-
-      setTimeout(() => {
-        submitAnswer(correct ? currentQuestion.correct_answer : '__wrong__', correct);
-        setSelectedAnswer(null);
-        setShowResult(false);
-      }, 2500);
-    },
-    [showResult, currentQuestion, submitAnswer]
-  );
-
   if (!currentQuestion) return null;
 
   return (
@@ -263,39 +242,7 @@ export default function QuizDisplay() {
         </div>
       )}
 
-      {/* Short answer / Fill blank */}
-      {(currentQuestion.question_type === 'short_answer' ||
-        currentQuestion.question_type === 'fill_blank') && (
-        <div className="flex flex-col items-center gap-5 w-full">
-          <p className="text-gray-300 text-lg">
-            학생의 답을 들은 후 판정해주세요
-          </p>
-          <div className="flex gap-5">
-            <motion.button
-              className="flex items-center gap-3 px-10 py-5 bg-gradient-to-br from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white rounded-xl text-2xl font-black transition-shadow hover:shadow-lg hover:shadow-green-500/20"
-              style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
-              onClick={() => handleTeacherJudge(true)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              disabled={showResult}
-            >
-              <ThumbsUp className="w-7 h-7" />
-              정답!
-            </motion.button>
-            <motion.button
-              className="flex items-center gap-3 px-10 py-5 bg-gradient-to-br from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl text-2xl font-black transition-shadow hover:shadow-lg hover:shadow-red-500/20"
-              style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
-              onClick={() => handleTeacherJudge(false)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              disabled={showResult}
-            >
-              <ThumbsDown className="w-7 h-7" />
-              오답!
-            </motion.button>
-          </div>
-        </div>
-      )}
+      {/* 주관식 제거됨 - 객관식과 OX만 지원 */}
 
       {/* Result overlay */}
       <AnimatePresence>

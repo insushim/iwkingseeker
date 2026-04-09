@@ -5,11 +5,13 @@ export function pickQuestion(
   pool: Question[],
   usedIds: string[]
 ): Question | null {
-  const available = pool.filter((q) => !usedIds.includes(q.id));
+  // 객관식(multiple_choice)과 OX만 허용, 주관식 제외
+  const validPool = pool.filter((q) => q.question_type === 'multiple_choice' || q.question_type === 'ox');
+  const available = validPool.filter((q) => !usedIds.includes(q.id));
 
   if (available.length === 0) {
-    if (pool.length === 0) return null;
-    return pool[Math.floor(Math.random() * pool.length)]!;
+    if (validPool.length === 0) return null;
+    return validPool[Math.floor(Math.random() * validPool.length)]!;
   }
 
   const minUsedCount = Math.min(...available.map((q) => q.used_count));
