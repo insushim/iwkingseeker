@@ -153,6 +153,7 @@ export default function QuizDisplay() {
         </motion.div>
 
         <Timer
+          key={currentQuestion.id}
           seconds={timerSeconds}
           isActive={!showResult}
           onTimeUp={handleTimeUp}

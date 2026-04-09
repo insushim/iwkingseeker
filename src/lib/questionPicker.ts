@@ -5,13 +5,12 @@ export function pickQuestion(
   pool: Question[],
   usedIds: string[]
 ): Question | null {
-  // 객관식(multiple_choice)과 OX만 허용, 주관식 제외
-  const validPool = pool.filter((q) => q.question_type === 'multiple_choice' || q.question_type === 'ox');
-  const available = validPool.filter((q) => !usedIds.includes(q.id));
+  const available = pool.filter((q) => !usedIds.includes(q.id));
 
   if (available.length === 0) {
-    if (validPool.length === 0) return null;
-    return validPool[Math.floor(Math.random() * validPool.length)]!;
+    if (pool.length === 0) return null;
+    // 전부 사용했으면 랜덤 재출제
+    return pool[Math.floor(Math.random() * pool.length)]!;
   }
 
   const minUsedCount = Math.min(...available.map((q) => q.used_count));
@@ -23,21 +22,8 @@ export function pickQuestion(
   const difficultyMatched = leastUsed.filter((q) => q.difficulty === targetDifficulty);
 
   if (difficultyMatched.length > 0) {
-    const shuffled = shuffleArray(difficultyMatched);
-    return shuffled[0]!;
+    return shuffleArray(difficultyMatched)[0]!;
   }
 
-  const shuffled = shuffleArray(leastUsed);
-  return shuffled[0]!;
-}
-
-export function filterQuestionsByUnit(
-  questions: Question[],
-  grade: number,
-  subject: string,
-  unit: string
-): Question[] {
-  return questions.filter(
-    (q) => q.grade === grade && q.subject === subject && q.unit === unit
-  );
+  return shuffleArray(leastUsed)[0]!;
 }
