@@ -53,9 +53,9 @@ export default function TeamSplitter() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-5xl mx-auto">
+    <div className="flex flex-col items-center gap-6 w-full max-w-7xl mx-auto">
       <motion.h2
-        className="text-3xl font-black text-white"
+        className="text-4xl font-black text-white"
         style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

@@ -30,7 +30,7 @@ export default function RockPaperScissors() {
       >
         <Zap className="w-8 h-8 text-yellow-400" />
         <h2
-          className="text-4xl font-black text-white"
+          className="text-5xl font-black text-white"
           style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
         >
           가위바위보!
@@ -39,7 +39,7 @@ export default function RockPaperScissors() {
       </motion.div>
 
       <motion.p
-        className="text-lg text-gray-300"
+        className="text-xl text-gray-300"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
@@ -60,14 +60,14 @@ export default function RockPaperScissors() {
           disabled={selecting}
         >
           <motion.span
-            className="text-6xl"
+            className="text-7xl"
             animate={{ rotate: [0, -5, 5, 0] }}
             transition={{ repeat: Infinity, duration: 3 }}
           >
             🐲
           </motion.span>
           <span
-            className="text-2xl font-black text-blue-400"
+            className="text-3xl font-black text-blue-400"
             style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
           >
             {teamA.name}
@@ -107,14 +107,14 @@ export default function RockPaperScissors() {
           disabled={selecting}
         >
           <motion.span
-            className="text-6xl"
+            className="text-7xl"
             animate={{ rotate: [0, 5, -5, 0] }}
             transition={{ repeat: Infinity, duration: 3 }}
           >
             🐯
           </motion.span>
           <span
-            className="text-2xl font-black text-amber-400"
+            className="text-3xl font-black text-amber-400"
             style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
           >
             {teamB.name}

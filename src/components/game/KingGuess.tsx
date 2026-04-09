@@ -37,7 +37,7 @@ export default function KingGuess() {
   const unrevealed = targetTeamData.students.filter((s) => !revealed.includes(s));
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-4xl mx-auto">
+    <div className="flex flex-col items-center gap-6 w-full max-w-6xl mx-auto">
       {/* Header */}
       <motion.div
         className="flex items-center gap-3"
@@ -51,7 +51,7 @@ export default function KingGuess() {
           <Crosshair className="w-8 h-8 text-yellow-400" />
         </motion.div>
         <h2
-          className="text-3xl font-black text-white"
+          className="text-4xl font-black text-white"
           style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
         >
           정답! 상대팀의 왕을 지목하세요!

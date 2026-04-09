@@ -156,7 +156,7 @@ export default function QuizDisplay() {
   if (!currentQuestion) return null;
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-4xl mx-auto">
+    <div className="flex flex-col items-center gap-6 w-full max-w-6xl mx-auto px-4">
       {/* Top bar: Attacker + Timer */}
       <div className="flex items-center justify-between w-full">
         <motion.div
@@ -191,7 +191,7 @@ export default function QuizDisplay() {
         <p className="text-sm text-purple-400/80 mb-3 font-medium">
           {currentQuestion.subject} &middot; {currentQuestion.unit}
         </p>
-        <h3 className="text-2xl md:text-3xl font-bold text-white leading-relaxed">
+        <h3 className="text-3xl md:text-4xl font-bold text-white leading-relaxed">
           {currentQuestion.question_text}
         </h3>
       </motion.div>
@@ -208,7 +208,7 @@ export default function QuizDisplay() {
               <motion.button
                 key={i}
                 className={cn(
-                  'relative p-5 rounded-xl border text-left text-lg font-bold text-white transition-all overflow-hidden',
+                  'relative p-6 rounded-xl border text-left text-xl font-bold text-white transition-all overflow-hidden',
                   showResult && isThisCorrect
                     ? 'bg-green-600 border-green-400/60 ring-2 ring-green-400/40 glow-green'
                     : showResult && isThisSelected && !isCorrect

@@ -124,7 +124,7 @@ export default function GameOver() {
           {winnerEmoji}
         </motion.span>
         <h1
-          className={`text-5xl md:text-6xl font-black bg-gradient-to-r ${winnerGradient} bg-clip-text text-transparent`}
+          className={`text-6xl md:text-7xl font-black bg-gradient-to-r ${winnerGradient} bg-clip-text text-transparent`}
           style={{
             fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif",
             WebkitTextFillColor: 'transparent',
@@ -136,7 +136,7 @@ export default function GameOver() {
 
       {/* Stats panel */}
       <motion.div
-        className={`glass-strong rounded-2xl p-6 w-full max-w-lg ${winnerGlow}`}
+        className={`glass-strong rounded-2xl p-8 w-full max-w-2xl ${winnerGlow}`}
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.9 }}

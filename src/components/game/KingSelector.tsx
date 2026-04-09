@@ -77,7 +77,7 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-4xl mx-auto">
+    <div className="flex flex-col items-center gap-6 w-full max-w-6xl mx-auto">
       {/* Warning banner */}
       <motion.div
         className="flex items-center gap-3 glass rounded-xl px-6 py-3"
@@ -98,7 +98,7 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
 
       {/* Title */}
       <motion.h2
-        className="text-2xl font-black text-white text-center"
+        className="text-3xl font-black text-white text-center"
         style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
         initial={{ y: -10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
