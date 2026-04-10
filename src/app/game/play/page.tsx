@@ -17,7 +17,8 @@ import KingGuess from '@/components/game/KingGuess';
 import RoundResult from '@/components/game/RoundResult';
 import WrongAnswer from '@/components/game/WrongAnswer';
 import GameOver from '@/components/game/GameOver';
-import { Maximize, Minimize, Volume2, VolumeX } from 'lucide-react';
+import { Maximize, Minimize, Volume2, VolumeX, Monitor } from 'lucide-react';
+import { DISPLAY_CHANNEL, sanitizeForDisplay } from '@/lib/displayChannel';
 
 export default function GamePlayPage() {
   const router = useRouter();
@@ -52,6 +53,45 @@ export default function GamePlayPage() {
 
   // Cleanup BGM on unmount
   useEffect(() => () => stopBgm(), []);
+
+  // Broadcast sanitized game state to display window via BroadcastChannel
+  useEffect(() => {
+    const channel = new BroadcastChannel(DISPLAY_CHANNEL);
+
+    // Broadcast on every Zustand state change
+    const unsub = useGameStore.subscribe((state) => {
+      channel.postMessage({ type: 'state', state: sanitizeForDisplay(state) });
+    });
+
+    // Also respond to display page requesting initial state
+    channel.onmessage = (e: MessageEvent) => {
+      if (e.data?.type === 'request-state') {
+        channel.postMessage({
+          type: 'state',
+          state: sanitizeForDisplay(useGameStore.getState()),
+        });
+      }
+    };
+
+    // Send initial state immediately (in case display is already open)
+    channel.postMessage({
+      type: 'state',
+      state: sanitizeForDisplay(useGameStore.getState()),
+    });
+
+    return () => {
+      unsub();
+      channel.close();
+    };
+  }, []);
+
+  const openDisplayWindow = useCallback(() => {
+    window.open(
+      '/game/display',
+      'kingseeker-display',
+      'popup=true,width=1280,height=720',
+    );
+  }, []);
 
   const toggleBgm = () => {
     setBgmOn((prev) => {
@@ -100,6 +140,15 @@ export default function GamePlayPage() {
             whileTap={{ scale: 0.9 }}
           >
             {bgmOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+          </motion.button>
+          <motion.button
+            onClick={openDisplayWindow}
+            className="p-2 glass rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+            title="학생 화면 열기"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <Monitor className="w-5 h-5" />
           </motion.button>
           <motion.button
             onClick={toggleFullscreen}

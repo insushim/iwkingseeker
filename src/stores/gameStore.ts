@@ -216,12 +216,16 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
           phase: isGameOver ? 'GAME_OVER' : 'ROUND_RESULT',
         });
       } else {
+        // 왕 못맞추면 공격권 전환
+        const newAttacker: 'team_a' | 'team_b' =
+          state.currentAttacker === 'team_a' ? 'team_b' : 'team_a';
         set({
           [revealedKey]: newRevealed,
           currentRoundQuestions: updatedRoundQuestions,
           lastGuessResult: 'not_found',
           lastGuessedStudent: studentName,
           currentQuestion: null,
+          currentAttacker: newAttacker,
           phase: 'ROUND_RESULT',
         });
       }
