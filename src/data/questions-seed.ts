@@ -4,6 +4,19 @@ import { seed2022Grade3 } from './seed-2022-grade3';
 import { seed2022Grade4 } from './seed-2022-grade4';
 import { seed2022Grade5 } from './seed-2022-grade5';
 import { seed2022Grade6 } from './seed-2022-grade6';
+import { seed2022Grade5MathS1 } from './seed-2022-grade5-math-s1';
+import { seed2022Grade5MathS2 } from './seed-2022-grade5-math-s2';
+import { seed2022Grade5Science } from './seed-2022-grade5-science';
+import { seed2022Grade5Social } from './seed-2022-grade5-social';
+import { seed2022Grade5EnglishS1a } from './seed-2022-grade5-english-s1a';
+import { seed2022Grade5EnglishS1b } from './seed-2022-grade5-english-s1b';
+import { seed2022Grade5EnglishS2a } from './seed-2022-grade5-english-s2a';
+import { seed2022Grade5EnglishS2b } from './seed-2022-grade5-english-s2b';
+import { seed2022Grade5KoreanU12 } from './seed-2022-grade5-korean-u12';
+import { seed2022Grade5KoreanU34 } from './seed-2022-grade5-korean-u34';
+import { seed2022Grade5KoreanU56 } from './seed-2022-grade5-korean-u56';
+import { seed2022Grade5KoreanU78 } from './seed-2022-grade5-korean-u78';
+import { seed2022Grade5KoreanU910 } from './seed-2022-grade5-korean-u910';
 
 export interface QuestionSeed {
   grade: number;
@@ -382,6 +395,12 @@ const seen = new Set<string>();
 export const questionsSeed: QuestionSeed[] = [
   ...baseQuestions, ...seedPart1, ...seedPart2,
   ...seed2022Grade3, ...seed2022Grade4, ...seed2022Grade5, ...seed2022Grade6,
+  ...seed2022Grade5MathS1, ...seed2022Grade5MathS2,
+  ...seed2022Grade5Science, ...seed2022Grade5Social,
+  ...seed2022Grade5EnglishS1a, ...seed2022Grade5EnglishS1b,
+  ...seed2022Grade5EnglishS2a, ...seed2022Grade5EnglishS2b,
+  ...seed2022Grade5KoreanU12, ...seed2022Grade5KoreanU34,
+  ...seed2022Grade5KoreanU56, ...seed2022Grade5KoreanU78, ...seed2022Grade5KoreanU910,
 ].filter((q) => {
   const key = `${q.grade}-${q.subject}-${q.question_text}`;
   if (seen.has(key)) return false;
