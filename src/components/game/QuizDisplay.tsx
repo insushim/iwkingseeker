@@ -6,7 +6,7 @@ import { useGameStore } from '@/stores/gameStore';
 import Timer from './Timer';
 import { playCorrectSound, playWrongSound } from '@/lib/sounds';
 import { cn } from '@/lib/utils';
-import { Sparkles, Zap, HelpCircle, ArrowRightLeft } from 'lucide-react';
+import { Sparkles, Zap, HelpCircle } from 'lucide-react';
 
 /**
  * 문제 표시 스타일:
@@ -100,8 +100,6 @@ export default function QuizDisplay() {
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showHint, setShowHint] = useState(false);
-  const [showTurnChange, setShowTurnChange] = useState(false);
-  const [pendingSubmit, setPendingSubmit] = useState<{ answer: string; correct: boolean } | null>(null);
 
   const attackerName = currentAttacker === 'team_a' ? teamA.name : teamB.name;
   const attackerEmoji = currentAttacker === 'team_a' ? '🐲' : '🐯';
@@ -136,12 +134,11 @@ export default function QuizDisplay() {
         }, 2000);
       } else {
         playWrongSound();
-        // 오답: 2초 오답 표시 → 2초 공수교대 화면 → 새 문제
+        // 오답: 1.5초 오답 표시 → WRONG_ANSWER phase로 직접 이동 (공수교대 1회만)
         setTimeout(() => {
           setShowResult(false);
           setSelectedAnswer(null);
-          setShowTurnChange(true);
-          setPendingSubmit({ answer, correct: false });
+          submitAnswer(answer, false);
         }, 1500);
       }
     },
@@ -149,79 +146,11 @@ export default function QuizDisplay() {
   );
 
   const handleTimeUp = useCallback(() => {
-    if (!showResult && !showTurnChange) handleAnswer('__timeout__');
-  }, [showResult, showTurnChange, handleAnswer]);
+    if (!showResult) handleAnswer('__timeout__');
+  }, [showResult, handleAnswer]);
 
-  // 공수교대 화면 2초 후 실제 제출
-  useEffect(() => {
-    if (!showTurnChange || !pendingSubmit) return;
-    const timer = setTimeout(() => {
-      setShowTurnChange(false);
-      submitAnswer(pendingSubmit.answer, pendingSubmit.correct);
-      setPendingSubmit(null);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [showTurnChange, pendingSubmit, submitAnswer]);
+  if (!currentQuestion) return null;
 
-  if (!currentQuestion && !showTurnChange) return null;
-
-  // 공수 교대 화면
-  if (showTurnChange) {
-    const nextTeamName = currentAttacker === 'team_a' ? teamA.name : teamB.name;
-    const nextEmoji = currentAttacker === 'team_a' ? '🐲' : '🐯';
-    const nextColor = currentAttacker === 'team_a' ? 'text-blue-400' : 'text-amber-400';
-    return (
-      <div className="flex flex-col items-center justify-center gap-6 w-full h-full">
-        <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-        >
-          <div className="p-8 rounded-full glass-strong" style={{ boxShadow: '0 0 40px rgba(147,51,234,0.3)' }}>
-            <ArrowRightLeft className="w-20 h-20 text-purple-400" />
-          </div>
-        </motion.div>
-        <motion.h2
-          className="text-6xl font-black text-white"
-          style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          공수 교대!
-        </motion.h2>
-        <motion.div
-          className="flex items-center gap-4 glass-strong rounded-2xl px-10 py-5"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <span className="text-6xl">{nextEmoji}</span>
-          <div>
-            <p className="text-gray-400 text-xl">다음 공격</p>
-            <p className={`text-4xl font-black ${nextColor}`}>{nextTeamName}</p>
-          </div>
-        </motion.div>
-        <motion.div
-          className="flex gap-2 mt-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-        >
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-3 h-3 rounded-full bg-purple-500"
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 1, repeat: Infinity, delay: i * 0.3 }}
-            />
-          ))}
-        </motion.div>
-      </div>
-    );
-  }
-
-  // showTurnChange이면 위에서 return됨. 여기 도달하면 currentQuestion은 반드시 존재
   const q = currentQuestion!;
   const isOX = q.question_type === 'ox';
   const options = q.options ?? [];
@@ -260,7 +189,7 @@ export default function QuizDisplay() {
               힌트
             </motion.button>
           )}
-          <Timer key={q.id} seconds={timerSeconds} isActive={!showResult && !showTurnChange} onTimeUp={handleTimeUp} size={70} />
+          <Timer key={q.id} seconds={timerSeconds} isActive={!showResult} onTimeUp={handleTimeUp} size={70} />
         </div>
       </div>
 
