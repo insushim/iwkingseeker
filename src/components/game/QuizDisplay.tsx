@@ -116,6 +116,16 @@ export default function QuizDisplay() {
     return getChosung(currentQuestion.correct_answer);
   }, [currentQuestion]);
 
+  // 학생 화면(display)에서 터치한 답을 수신
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const answer = (e as CustomEvent).detail;
+      if (answer && typeof answer === 'string') handleAnswer(answer);
+    };
+    window.addEventListener('display-answer', handler);
+    return () => window.removeEventListener('display-answer', handler);
+  });
+
   const handleAnswer = useCallback(
     (answer: string) => {
       if (showResult || !currentQuestion) return;

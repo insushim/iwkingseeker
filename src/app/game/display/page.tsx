@@ -215,10 +215,10 @@ function DisplayTimer({ seconds, isActive, size = 70 }: {
    ────────────────────────────────────── */
 
 const STYLE_COLORS = [
-  { bg: 'bg-red-600/80 border-red-400/40', label: 'A' },
-  { bg: 'bg-blue-600/80 border-blue-400/40', label: 'B' },
-  { bg: 'bg-green-600/80 border-green-400/40', label: 'C' },
-  { bg: 'bg-yellow-600/80 border-yellow-400/40', label: 'D' },
+  { bg: 'bg-red-600/80 hover:bg-red-500/90 border-red-400/40', glow: 'hover:shadow-red-500/20 hover:shadow-lg', label: 'A' },
+  { bg: 'bg-blue-600/80 hover:bg-blue-500/90 border-blue-400/40', glow: 'hover:shadow-blue-500/20 hover:shadow-lg', label: 'B' },
+  { bg: 'bg-green-600/80 hover:bg-green-500/90 border-green-400/40', glow: 'hover:shadow-green-500/20 hover:shadow-lg', label: 'C' },
+  { bg: 'bg-yellow-600/80 hover:bg-yellow-500/90 border-yellow-400/40', glow: 'hover:shadow-yellow-500/20 hover:shadow-lg', label: 'D' },
 ];
 
 const STYLE_EMOJIS = ['🔴', '🔵', '🟢', '🟡'];
@@ -372,9 +372,13 @@ function RPSWaiting({ teamAName, teamBName }: { teamAName: string; teamBName: st
   );
 }
 
-function DisplayQuiz({ state }: { state: DisplayState }) {
+function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: React.RefObject<BroadcastChannel | null> }) {
   const q = state.currentQuestion;
   if (!q) return null;
+
+  const sendAnswer = (answer: string) => {
+    channelRef.current?.postMessage({ type: 'action', action: 'answer', value: answer });
+  };
 
   const attackerName = state.currentAttacker === 'team_a' ? state.teamA.name : state.teamB.name;
   const attackerEmoji = state.currentAttacker === 'team_a' ? '🐲' : '🐯';
@@ -438,21 +442,24 @@ function DisplayQuiz({ state }: { state: DisplayState }) {
         </div>
       </motion.div>
 
-      {/* Answer options (read-only, no onClick) */}
+      {/* Answer options — 터치 가능 (전자칠판 대응) */}
       {isOX ? (
         <div className="flex gap-6 w-full justify-center flex-1 items-center">
           {['O', 'X'].map((choice) => (
-            <div
+            <motion.button
               key={choice}
+              onClick={() => sendAnswer(choice)}
               className={cn(
-                'w-40 h-40 rounded-full text-8xl font-black border-4 flex items-center justify-center',
+                'w-40 h-40 rounded-full text-8xl font-black border-4 flex items-center justify-center cursor-pointer',
                 choice === 'O'
-                  ? 'bg-blue-600/70 border-blue-400/40'
-                  : 'bg-red-600/70 border-red-400/40',
+                  ? 'bg-blue-600/70 hover:bg-blue-500/80 border-blue-400/40'
+                  : 'bg-red-600/70 hover:bg-red-500/80 border-red-400/40',
               )}
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9 }}
             >
               {choice}
-            </div>
+            </motion.button>
           ))}
         </div>
       ) : quizStyle === 'grid' ? (
@@ -460,19 +467,22 @@ function DisplayQuiz({ state }: { state: DisplayState }) {
           {options.map((option, i) => {
             const style = STYLE_COLORS[i]!;
             return (
-              <motion.div
+              <motion.button
                 key={i}
+                onClick={() => sendAnswer(option)}
                 className={cn(
-                  'relative p-6 rounded-xl border text-left text-2xl md:text-3xl font-bold text-white',
-                  style.bg,
+                  'relative p-6 rounded-xl border text-left text-2xl md:text-3xl font-bold text-white cursor-pointer',
+                  style.bg, style.glow,
                 )}
                 initial={{ x: i % 2 === 0 ? -30 : 30, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: i * 0.08 }}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <span className="mr-4 text-4xl font-black opacity-40">{style.label}</span>
                 {option}
-              </motion.div>
+              </motion.button>
             );
           })}
         </div>
@@ -481,19 +491,22 @@ function DisplayQuiz({ state }: { state: DisplayState }) {
           {options.map((option, i) => {
             const style = STYLE_COLORS[i]!;
             return (
-              <motion.div
+              <motion.button
                 key={i}
+                onClick={() => sendAnswer(option)}
                 className={cn(
-                  'flex items-center gap-4 px-8 py-5 rounded-2xl border text-left text-2xl md:text-3xl font-bold text-white',
-                  style.bg,
+                  'flex items-center gap-4 px-8 py-5 rounded-2xl border text-left text-2xl md:text-3xl font-bold text-white cursor-pointer',
+                  style.bg, style.glow,
                 )}
                 initial={{ x: -60, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: i * 0.12, type: 'spring', stiffness: 200 }}
+                whileHover={{ scale: 1.01, x: 8 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <span className="text-4xl">{STYLE_EMOJIS[i]}</span>
                 <span className="flex-1">{option}</span>
-              </motion.div>
+              </motion.button>
             );
           })}
         </div>
@@ -502,19 +515,22 @@ function DisplayQuiz({ state }: { state: DisplayState }) {
           {options.map((option, i) => {
             const style = STYLE_COLORS[i]!;
             return (
-              <motion.div
+              <motion.button
                 key={i}
+                onClick={() => sendAnswer(option)}
                 className={cn(
-                  'relative flex flex-col items-center justify-center rounded-2xl border-2 text-center text-2xl md:text-3xl font-black text-white',
-                  style.bg,
+                  'relative flex flex-col items-center justify-center rounded-2xl border-2 text-center text-2xl md:text-3xl font-black text-white cursor-pointer',
+                  style.bg, style.glow,
                 )}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: i * 0.1, type: 'spring' }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
               >
                 <span className="text-5xl mb-2 opacity-30">{style.label}</span>
                 <span className="px-4 leading-snug">{option}</span>
-              </motion.div>
+              </motion.button>
             );
           })}
         </div>
@@ -523,19 +539,22 @@ function DisplayQuiz({ state }: { state: DisplayState }) {
           {options.map((option, i) => {
             const style = STYLE_COLORS[i]!;
             return (
-              <motion.div
+              <motion.button
                 key={i}
+                onClick={() => sendAnswer(option)}
                 className={cn(
-                  'relative flex items-center gap-4 px-6 py-5 rounded-xl border text-left text-2xl md:text-3xl font-bold text-white',
-                  style.bg,
+                  'relative flex items-center gap-4 px-6 py-5 rounded-xl border text-left text-2xl md:text-3xl font-bold text-white cursor-pointer',
+                  style.bg, style.glow,
                 )}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: i * 0.05 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <span className="text-4xl font-black opacity-50 shrink-0 w-12 text-center">{i + 1}</span>
                 <span className="flex-1">{option}</span>
-              </motion.div>
+              </motion.button>
             );
           })}
         </div>
@@ -876,10 +895,12 @@ function DisplayGameOver({ state }: { state: DisplayState }) {
 export default function DisplayPage() {
   const [gameState, setGameState] = useState<DisplayState | null>(null);
   const { isFullscreen, toggleFullscreen } = useFullscreen();
+  const channelRef = useRef<BroadcastChannel | null>(null);
 
   // Listen to BroadcastChannel from teacher page
   useEffect(() => {
     const channel = new BroadcastChannel(DISPLAY_CHANNEL);
+    channelRef.current = channel;
     channel.onmessage = (e: MessageEvent) => {
       if (e.data?.type === 'state') {
         setGameState(e.data.state as DisplayState);
@@ -891,7 +912,7 @@ export default function DisplayPage() {
     reqChannel.postMessage({ type: 'request-state' });
     reqChannel.close();
 
-    return () => channel.close();
+    return () => { channel.close(); channelRef.current = null; };
   }, []);
 
   // Auto fullscreen on first user interaction
@@ -932,7 +953,7 @@ export default function DisplayPage() {
       case 'RPS':
         return <RPSWaiting teamAName={gameState.teamA.name} teamBName={gameState.teamB.name} />;
       case 'QUIZ':
-        return <DisplayQuiz state={gameState} />;
+        return <DisplayQuiz state={gameState} channelRef={channelRef} />;
       case 'WRONG_ANSWER':
         return <DisplayWrongAnswer state={gameState} />;
       case 'GUESS_KING': {

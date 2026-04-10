@@ -63,13 +63,17 @@ export default function GamePlayPage() {
       channel.postMessage({ type: 'state', state: sanitizeForDisplay(state) });
     });
 
-    // Also respond to display page requesting initial state
+    // Listen for messages from display page
     channel.onmessage = (e: MessageEvent) => {
       if (e.data?.type === 'request-state') {
         channel.postMessage({
           type: 'state',
           state: sanitizeForDisplay(useGameStore.getState()),
         });
+      }
+      // 학생 화면에서 답 선택 → 교사 화면에 전달
+      if (e.data?.type === 'action' && e.data?.action === 'answer') {
+        window.dispatchEvent(new CustomEvent('display-answer', { detail: e.data.value }));
       }
     };
 

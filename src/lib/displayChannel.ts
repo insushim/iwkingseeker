@@ -33,6 +33,13 @@ export interface DisplayMessage {
   state: DisplayState;
 }
 
+/** 학생 화면 → 교사 화면으로 보내는 액션 */
+export interface DisplayAction {
+  type: 'action';
+  action: 'answer';
+  value: string; // 선택한 답
+}
+
 /**
  * Strip sensitive fields from the full Zustand GameState
  * before broadcasting to the student display window.
