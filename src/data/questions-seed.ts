@@ -207,16 +207,7 @@ const baseQuestions: QuestionSeed[] = [
 
   // 5학년 국어: 2022 개정 국정교과서 → seed-2022-grade5-korean-1s-*.ts 파일에서 제공
 
-  // ============================================================
-  // 5학년 사회
-  // ============================================================
-  { grade: 5, subject: '사회', unit: '1. 국토와 우리 생활', unit_code: '[6사01-01]', question_type: 'multiple_choice', question_text: '우리나라의 영토에서 가장 동쪽에 있는 섬은?', options: ['독도', '제주도', '울릉도', '마라도'], correct_answer: '독도', explanation: '독도는 우리나라 영토의 가장 동쪽에 위치한 섬으로, 경상북도 울릉군에 속합니다.', difficulty: 1 },
-  { grade: 5, subject: '사회', unit: '1. 국토와 우리 생활', unit_code: '[6사01-01]', question_type: 'ox', question_text: '우리나라는 삼면이 바다로 둘러싸인 반도 국가이다.', options: ['O', 'X'], correct_answer: 'O', explanation: '우리나라는 동해, 서해, 남해 삼면이 바다로 둘러싸인 반도 국가입니다.', difficulty: 1 },
-  { grade: 5, subject: '사회', unit: '1. 국토와 우리 생활', unit_code: '[6사01-01]', question_type: 'multiple_choice', question_text: '우리나라에서 가장 긴 강은?', options: ['낙동강', '한강', '금강', '영산강'], correct_answer: '낙동강', explanation: '낙동강은 약 525km로 우리나라에서 가장 긴 강입니다.', difficulty: 2 },
-  { grade: 5, subject: '사회', unit: '2. 인권 존중과 정의로운 사회', unit_code: '[6사02-01]', question_type: 'multiple_choice', question_text: '모든 사람이 태어날 때부터 가지는 권리를 무엇이라 하나요?', options: ['인권', '특권', '직권', '면권'], correct_answer: '인권', explanation: '인권은 인간이라면 누구나 태어나면서 가지는 기본적인 권리입니다.', difficulty: 1 },
-  { grade: 5, subject: '사회', unit: '2. 인권 존중과 정의로운 사회', unit_code: '[6사02-01]', question_type: 'ox', question_text: '어린이도 인권을 가진다.', options: ['O', 'X'], correct_answer: 'O', explanation: '인권은 나이, 성별 등에 관계없이 모든 사람이 가지는 권리입니다.', difficulty: 1 },
-  { grade: 5, subject: '사회', unit: '3. 우리 경제의 성장과 발전', unit_code: '[6사03-01]', question_type: 'multiple_choice', question_text: '물건을 만들어 파는 경제 활동은?', options: ['생산', '소비', '저축', '투자'], correct_answer: '생산', explanation: '생산은 사람들에게 필요한 물건이나 서비스를 만들어내는 경제 활동입니다.', difficulty: 1 },
-  { grade: 5, subject: '사회', unit: '4. 우리 사회의 과제와 문화의 발전', unit_code: '[6사04-01]', question_type: 'multiple_choice', question_text: '우리 사회가 해결해야 할 과제가 아닌 것은?', options: ['외국어만 사용하기', '환경 보호', '빈부 격차 해소', '다문화 존중'], correct_answer: '외국어만 사용하기', explanation: '우리 사회는 환경 보호, 빈부 격차 해소, 다문화 존중 등의 과제를 해결해야 합니다.', difficulty: 2 },
+  // 5학년 사회: 2022 개정 → seed-2022-grade5-social.ts 에서 제공
 
   // ============================================================
   // 5학년 과학
@@ -359,7 +350,6 @@ const baseQuestions: QuestionSeed[] = [
   { grade: 5, subject: '수학', unit: '10. 소수의 곱셈', unit_code: '[6수01-07]', question_type: 'short_answer', question_text: '1.5 × 4 의 결과는?', options: null, correct_answer: '6', explanation: '15 × 4 = 60, 소수점 한 자리이므로 6.0 = 6', difficulty: 1 },
   { grade: 5, subject: '과학', unit: '4. 용해와 용액', unit_code: '[6과04-01]', question_type: 'ox', question_text: '온도가 높을수록 물에 녹는 설탕의 양은 많아진다.', options: ['O', 'X'], correct_answer: 'O', explanation: '대부분의 고체 물질은 물의 온도가 높아질수록 더 많이 녹습니다.', difficulty: 2 },
   { grade: 5, subject: '과학', unit: '5. 다양한 생물과 우리 생활', unit_code: '[6과02-01]', question_type: 'ox', question_text: '세균은 맨눈으로 볼 수 없다.', options: ['O', 'X'], correct_answer: 'O', explanation: '세균은 매우 작아서 현미경으로만 관찰할 수 있습니다.', difficulty: 1 },
-  { grade: 5, subject: '사회', unit: '3. 우리 경제의 성장과 발전', unit_code: '[6사03-01]', question_type: 'ox', question_text: '소비는 물건이나 서비스를 사서 사용하는 경제 활동이다.', options: ['O', 'X'], correct_answer: 'O', explanation: '소비는 생산된 물건이나 서비스를 구매하여 사용하는 활동입니다.', difficulty: 1 },
   // 추가 보충 문제 — 6학년
   { grade: 6, subject: '수학', unit: '1. 분수의 나눗셈', unit_code: '[6수01-08]', question_type: 'multiple_choice', question_text: '2/5 ÷ 1/3 의 결과는?', options: ['6/5', '2/15', '1/5', '3/10'], correct_answer: '6/5', explanation: '2/5 × 3/1 = 6/5', difficulty: 2 },
   { grade: 6, subject: '수학', unit: '3. 소수의 나눗셈', unit_code: '[6수01-09]', question_type: 'short_answer', question_text: '4.8 ÷ 1.2 의 결과는?', options: null, correct_answer: '4', explanation: '48 ÷ 12 = 4', difficulty: 1 },
