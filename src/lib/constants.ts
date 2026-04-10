@@ -165,7 +165,7 @@ export const CURRICULUM_UNITS: Record<string, Record<string, string[]>> = {
     '수학': [
       '1. 자연수의 혼합 계산',
       '2. 약수와 배수',
-      '3. 규칙과 대응',
+      '3. 대응 관계',
       '4. 약분과 통분',
       '5. 분수의 덧셈과 뺄셈',
       '6. 다각형의 둘레와 넓이',

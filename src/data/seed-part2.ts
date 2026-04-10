@@ -103,11 +103,11 @@ export const seedPart2: QuestionSeed[] = [
     explanation: '모든 자연수는 1로 나누어떨어지므로 1은 모든 자연수의 약수입니다.',
     difficulty: 1,
   },
-  // 3. 규칙과 대응
+  // 3. 대응 관계
   {
     grade: 5,
     subject: '수학',
-    unit: '3. 규칙과 대응',
+    unit: '3. 대응 관계',
     unit_code: null,
     question_type: 'multiple_choice',
     question_text: '△ = □ × 3 일 때, □가 5이면 △는 얼마인가요?',
@@ -119,7 +119,7 @@ export const seedPart2: QuestionSeed[] = [
   {
     grade: 5,
     subject: '수학',
-    unit: '3. 규칙과 대응',
+    unit: '3. 대응 관계',
     unit_code: null,
     question_type: 'fill_blank',
     question_text: '수 배열 2, 5, 8, 11, ___에서 빈칸에 알맞은 수를 쓰세요.',
@@ -131,7 +131,7 @@ export const seedPart2: QuestionSeed[] = [
   {
     grade: 5,
     subject: '수학',
-    unit: '3. 규칙과 대응',
+    unit: '3. 대응 관계',
     unit_code: null,
     question_type: 'multiple_choice',
     question_text: '○ = △ + 4 일 때, △가 7이면 ○는?',
@@ -4084,7 +4084,7 @@ export const seedPart2: QuestionSeed[] = [
   {
     grade: 5,
     subject: '수학',
-    unit: '3. 규칙과 대응',
+    unit: '3. 대응 관계',
     unit_code: null,
     question_type: 'multiple_choice',
     question_text: '○ = △ × 2 + 1 일 때, △가 4이면 ○는?',
