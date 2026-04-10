@@ -12,11 +12,10 @@ import { seed2022Grade5EnglishS1a } from './seed-2022-grade5-english-s1a';
 import { seed2022Grade5EnglishS1b } from './seed-2022-grade5-english-s1b';
 import { seed2022Grade5EnglishS2a } from './seed-2022-grade5-english-s2a';
 import { seed2022Grade5EnglishS2b } from './seed-2022-grade5-english-s2b';
-import { seed2022Grade5KoreanU12 } from './seed-2022-grade5-korean-u12';
-import { seed2022Grade5KoreanU34 } from './seed-2022-grade5-korean-u34';
-import { seed2022Grade5KoreanU56 } from './seed-2022-grade5-korean-u56';
-import { seed2022Grade5KoreanU78 } from './seed-2022-grade5-korean-u78';
-import { seed2022Grade5KoreanU910 } from './seed-2022-grade5-korean-u910';
+// 2022 개정 국어 1학기 (2학기는 교과서 미출간으로 추후 추가)
+import { seed2022Grade5Korean1sU12 } from './seed-2022-grade5-korean-1s-u12';
+import { seed2022Grade5Korean1sU34 } from './seed-2022-grade5-korean-1s-u34';
+import { seed2022Grade5Korean1sU56 } from './seed-2022-grade5-korean-1s-u56';
 
 export interface QuestionSeed {
   grade: number;
@@ -399,8 +398,7 @@ export const questionsSeed: QuestionSeed[] = [
   ...seed2022Grade5Science, ...seed2022Grade5Social,
   ...seed2022Grade5EnglishS1a, ...seed2022Grade5EnglishS1b,
   ...seed2022Grade5EnglishS2a, ...seed2022Grade5EnglishS2b,
-  ...seed2022Grade5KoreanU12, ...seed2022Grade5KoreanU34,
-  ...seed2022Grade5KoreanU56, ...seed2022Grade5KoreanU78, ...seed2022Grade5KoreanU910,
+  ...seed2022Grade5Korean1sU12, ...seed2022Grade5Korean1sU34, ...seed2022Grade5Korean1sU56,
 ].filter((q) => {
   const key = `${q.grade}-${q.subject}-${q.question_text}`;
   if (seen.has(key)) return false;
