@@ -95,7 +95,6 @@ export const seed2022Grade5OtherHard: QuestionSeed[] = [
   { grade: 5, subject: '과학', unit: '4. 우리 몸의 구조와 기능', unit_code: null, question_type: 'short_answer', question_text: '음식물을 잘게 부수고 소화액과 섞어 죽처럼 만드는 기관은 어디인가요?', options: null, correct_answer: '위', explanation: '위는 위액을 분비하고 음식물을 잘게 부수어 죽처럼 만든 뒤 작은창자로 보냅니다.', difficulty: 3 },
   { grade: 5, subject: '과학', unit: '4. 우리 몸의 구조와 기능', unit_code: null, question_type: 'ox', question_text: '우리 몸의 뼈는 어른이 되면 약 206개이다.', options: ['O', 'X'], correct_answer: 'O', explanation: '어른의 몸에는 약 206개의 뼈가 있습니다. 어린이 때는 더 많지만 자라면서 일부가 합쳐집니다.', difficulty: 3 },
   { grade: 5, subject: '과학', unit: '4. 우리 몸의 구조와 기능', unit_code: null, question_type: 'multiple_choice', question_text: '뇌에서 시작된 명령이 근육까지 전달되는 경로는?', options: ['뇌→근육→신경', '뇌→신경→근육', '근육→신경→뇌', '신경→뇌→근육'], correct_answer: '뇌→신경→근육', explanation: '뇌에서 내린 명령은 신경을 통해 근육에 전달되어 몸이 움직입니다.', difficulty: 3 },
-  { grade: 5, subject: '과학', unit: '4. 우리 몸의 구조와 기능', unit_code: null, question_type: 'multiple_choice', question_text: '음식물이 소화되는 올바른 순서는?', options: ['입→위→소장→대장', '입→대장→소장→위', '위→입→소장→대장', '입→소장→위→대장'], correct_answer: '입→위→소장→대장', explanation: '음식물은 입에서 잘게 부서진 뒤 식도를 거쳐 위에서 소화되고, 소장에서 영양분이 흡수되며, 대장에서 수분이 흡수됩니다.', difficulty: 3 },
 
   // ============================================================
   // 과학 5. 혼합물의 분리 (20문제)
@@ -119,7 +118,6 @@ export const seed2022Grade5OtherHard: QuestionSeed[] = [
   { grade: 5, subject: '과학', unit: '5. 혼합물의 분리', unit_code: null, question_type: 'short_answer', question_text: '혼합물에서 자석에 붙는 물질만 골라내는 방법은 무엇의 성질을 이용한 것인가요?', options: null, correct_answer: '자성', explanation: '자석에 붙는 성질(자성)을 이용하여 철 가루 등을 분리합니다.', difficulty: 3 },
   { grade: 5, subject: '과학', unit: '5. 혼합물의 분리', unit_code: null, question_type: 'ox', question_text: '두 가지 이상의 물질이 섞여 있는 것을 혼합물이라 한다.', options: ['O', 'X'], correct_answer: 'O', explanation: '두 가지 이상의 물질이 섞여 있는 것을 혼합물이라 하며, 각 물질의 성질이 변하지 않습니다.', difficulty: 3 },
   { grade: 5, subject: '과학', unit: '5. 혼합물의 분리', unit_code: null, question_type: 'multiple_choice', question_text: '다음 중 순물질(한 가지 물질로 이루어진 것)은?', options: ['소금물', '공기', '설탕', '우유'], correct_answer: '설탕', explanation: '소금물, 공기, 우유는 여러 물질이 섞인 혼합물이지만, 설탕은 한 가지 물질(순물질)입니다.', difficulty: 3 },
-  { grade: 5, subject: '과학', unit: '5. 혼합물의 분리', unit_code: null, question_type: 'multiple_choice', question_text: '콩과 쌀이 섞인 혼합물을 분리하는 데 가장 알맞은 도구는?', options: ['자석', '체', '증발접시', '거름종이'], correct_answer: '체', explanation: '콩과 쌀은 알갱이 크기가 다르므로, 체를 이용해 크기 차이로 분리할 수 있습니다.', difficulty: 3 },
 
   // ============================================================
   // 과학 6. 날씨와 우리 생활 (20문제)
@@ -142,8 +140,6 @@ export const seed2022Grade5OtherHard: QuestionSeed[] = [
   { grade: 5, subject: '과학', unit: '6. 날씨와 우리 생활', unit_code: null, question_type: 'short_answer', question_text: '바람의 세기와 방향을 알려주는 기구를 무엇이라 하나요?', options: null, correct_answer: '풍향풍속계', explanation: '풍향풍속계는 바람이 불어오는 방향(풍향)과 바람의 세기(풍속)를 동시에 측정하는 기구입니다.', difficulty: 3 },
   { grade: 5, subject: '과학', unit: '6. 날씨와 우리 생활', unit_code: null, question_type: 'multiple_choice', question_text: '비가 오기 전에 나타나는 현상이 아닌 것은?', options: ['하늘에 구름이 많아진다', '습도가 높아진다', '제비가 낮게 난다', '하늘이 맑고 파랗다'], correct_answer: '하늘이 맑고 파랗다', explanation: '비 오기 전에는 구름이 많아지고 습도가 올라갑니다. 하늘이 맑고 파란 것은 맑은 날씨의 특징입니다.', difficulty: 3 },
   { grade: 5, subject: '과학', unit: '6. 날씨와 우리 생활', unit_code: null, question_type: 'ox', question_text: '서리는 이슬이 얼어서 만들어진 것이다.', options: ['O', 'X'], correct_answer: 'X', explanation: '서리는 수증기가 물방울 단계를 거치지 않고 바로 얼음 결정으로 변한 것이지, 이슬이 얼어서 된 것이 아닙니다.', difficulty: 3 },
-  { grade: 5, subject: '과학', unit: '6. 날씨와 우리 생활', unit_code: null, question_type: 'multiple_choice', question_text: '여름에 아스팔트 위에서 아지랑이가 보이는 이유는?', options: ['먼지가 많아서', '뜨거운 지면 위의 공기가 불규칙하게 움직여 빛이 굴절되기 때문에', '하늘에서 빛이 내려오기 때문에', '눈이 피로하기 때문에'], correct_answer: '뜨거운 지면 위의 공기가 불규칙하게 움직여 빛이 굴절되기 때문에', explanation: '뜨거운 지면이 공기를 데우면 공기의 밀도가 달라지고, 빛이 굴절되어 아지랑이처럼 보입니다.', difficulty: 3 },
-  { grade: 5, subject: '과학', unit: '6. 날씨와 우리 생활', unit_code: null, question_type: 'fill_blank', question_text: '공기 중의 수증기가 차가운 물체 표면에서 물방울로 변하는 현상을 ( )(이)라고 합니다.', options: null, correct_answer: '응결', explanation: '수증기가 냉각되어 물방울로 변하는 현상을 응결이라 하며, 이슬이나 안개가 대표적인 예입니다.', difficulty: 3 },
 
   // ============================================================
   // 과학 7. 열과 우리 생활 (20문제)
@@ -310,6 +306,8 @@ export const seed2022Grade5OtherHard: QuestionSeed[] = [
   { grade: 5, subject: '국어', unit: '2. 체험한 일을 글로 써요', unit_code: null, question_type: 'short_answer', question_text: '글의 내용을 미리 정리하여 쓰는 계획을 무엇이라 하나요?', options: null, correct_answer: '개요', explanation: '개요는 글을 쓰기 전에 어떤 내용을 어떤 순서로 쓸지 미리 정리하는 것입니다.', difficulty: 3 },
   { grade: 5, subject: '국어', unit: '2. 체험한 일을 글로 써요', unit_code: null, question_type: 'ox', question_text: '체험 글을 쓸 때 대화를 넣으면 글이 더 생생해진다.', options: ['O', 'X'], correct_answer: 'O', explanation: '체험 글에 그때 나눈 대화를 넣으면 현장감이 살아나고 글이 더 생생해집니다.', difficulty: 3 },
   { grade: 5, subject: '국어', unit: '2. 체험한 일을 글로 써요', unit_code: null, question_type: 'multiple_choice', question_text: '다음 중 체험한 일을 쓸 때의 좋은 습관은?', options: ['체험 직후에 바로 기록한다', '1년 뒤에 기억을 더듬어 쓴다', '친구의 체험을 대신 쓴다', '기억이 안 나면 지어낸다'], correct_answer: '체험 직후에 바로 기록한다', explanation: '체험 직후에 기록하면 세세한 부분까지 정확하게 쓸 수 있어 좋은 글이 됩니다.', difficulty: 3 },
+  { grade: 5, subject: '국어', unit: '2. 체험한 일을 글로 써요', unit_code: null, question_type: 'multiple_choice', question_text: '"파란 하늘 아래 시원한 바람이 불었다"에서 사용된 감각 표현은?', options: ['시각과 촉각', '청각과 미각', '후각과 촉각', '미각과 시각'], correct_answer: '시각과 촉각', explanation: '"파란 하늘"은 눈으로 본 시각적 표현이고, "시원한 바람"은 피부로 느낀 촉각적 표현입니다.', difficulty: 3 },
+  { grade: 5, subject: '국어', unit: '2. 체험한 일을 글로 써요', unit_code: null, question_type: 'ox', question_text: '체험한 일을 글로 쓸 때는 자신의 생각이나 느낌을 빼고 사실만 적어야 한다.', options: ['O', 'X'], correct_answer: 'X', explanation: '체험한 일을 글로 쓸 때는 사실뿐만 아니라 자신의 생각이나 느낌도 함께 써야 생생하고 의미 있는 글이 됩니다.', difficulty: 3 },
 
   // ============================================================
   // 국어 3. 발표하고 질문해요 (20문제)
@@ -332,6 +330,8 @@ export const seed2022Grade5OtherHard: QuestionSeed[] = [
   { grade: 5, subject: '국어', unit: '3. 발표하고 질문해요', unit_code: null, question_type: 'short_answer', question_text: '발표할 때 긴장을 줄이는 좋은 방법 중 하나는 발표 내용을 미리 충분히 무엇하는 것인가요?', options: null, correct_answer: '연습', explanation: '발표 전에 충분히 연습하면 자신감이 생기고 긴장이 줄어듭니다.', difficulty: 3 },
   { grade: 5, subject: '국어', unit: '3. 발표하고 질문해요', unit_code: null, question_type: 'ox', question_text: '발표 자료는 글자를 최대한 많이 넣어야 좋다.', options: ['O', 'X'], correct_answer: 'X', explanation: '발표 자료에 글자가 너무 많으면 보기 어렵고 집중이 안 되므로, 핵심만 간결하게 정리하는 것이 좋습니다.', difficulty: 3 },
   { grade: 5, subject: '국어', unit: '3. 발표하고 질문해요', unit_code: null, question_type: 'multiple_choice', question_text: '발표할 때 몸짓(제스처)을 사용하면 좋은 점은?', options: ['발표가 짧아진다', '듣는 사람의 이해를 돕고 흥미를 끈다', '발표 내용이 바뀐다', '발표를 빨리 끝낼 수 있다'], correct_answer: '듣는 사람의 이해를 돕고 흥미를 끈다', explanation: '적절한 몸짓은 말을 보충해 주고, 듣는 사람의 흥미와 이해를 높여줍니다.', difficulty: 3 },
+  { grade: 5, subject: '국어', unit: '3. 발표하고 질문해요', unit_code: null, question_type: 'multiple_choice', question_text: '좋은 질문의 조건으로 알맞지 않은 것은?', options: ['발표 내용과 관련이 있다', '구체적이고 분명하다', '발표자를 당황시키려는 목적이다', '더 알고 싶은 점을 묻는다'], correct_answer: '발표자를 당황시키려는 목적이다', explanation: '좋은 질문은 발표 내용을 더 잘 이해하기 위한 것이지, 발표자를 곤란하게 하려는 것이 아닙니다.', difficulty: 3 },
+  { grade: 5, subject: '국어', unit: '3. 발표하고 질문해요', unit_code: null, question_type: 'fill_blank', question_text: '발표할 때 사진, 그래프, 표 등을 활용하면 듣는 사람의 ( )을/를 높일 수 있습니다.', options: null, correct_answer: '이해', explanation: '시각 자료를 활용하면 복잡한 내용도 쉽게 전달할 수 있어 듣는 사람의 이해를 높입니다.', difficulty: 3 },
 
   // ============================================================
   // 국어 4. 대상을 설명해요 (20문제)
@@ -354,6 +354,8 @@ export const seed2022Grade5OtherHard: QuestionSeed[] = [
   { grade: 5, subject: '국어', unit: '4. 대상을 설명해요', unit_code: null, question_type: 'short_answer', question_text: '설명하는 글에서 순서대로 알려주는 방법을 무엇이라 하나요? (예: 요리 순서, 만들기 순서)', options: null, correct_answer: '과정', explanation: '어떤 일을 하는 순서나 절차를 차례대로 설명하는 방법을 과정 설명이라 합니다.', difficulty: 3 },
   { grade: 5, subject: '국어', unit: '4. 대상을 설명해요', unit_code: null, question_type: 'ox', question_text: '설명하는 글을 쓸 때는 읽는 사람이 누구인지 생각하면서 써야 한다.', options: ['O', 'X'], correct_answer: 'O', explanation: '읽는 사람의 수준과 관심을 고려하여 설명해야 효과적으로 내용을 전달할 수 있습니다.', difficulty: 3 },
   { grade: 5, subject: '국어', unit: '4. 대상을 설명해요', unit_code: null, question_type: 'multiple_choice', question_text: '설명하는 글을 쓰기 전에 해야 할 일이 아닌 것은?', options: ['설명할 대상 정하기', '자료 조사하기', '내용 정리하기', '소설 읽기'], correct_answer: '소설 읽기', explanation: '설명하는 글을 쓰기 전에는 대상 정하기, 자료 조사, 내용 정리 등이 필요하지만, 소설 읽기는 관련이 없습니다.', difficulty: 3 },
+  { grade: 5, subject: '국어', unit: '4. 대상을 설명해요', unit_code: null, question_type: 'multiple_choice', question_text: '"사과는 빨간색이고, 바나나는 노란색이다."에서 사용된 설명 방법은?', options: ['비교', '정의', '예시', '인과'], correct_answer: '비교', explanation: '두 대상의 차이점이나 공통점을 밝히는 것을 비교(대조)라고 합니다. 사과와 바나나의 색깔을 견주어 설명하고 있습니다.', difficulty: 3 },
+  { grade: 5, subject: '국어', unit: '4. 대상을 설명해요', unit_code: null, question_type: 'fill_blank', question_text: '설명하는 글에서 모르는 낱말의 뜻을 풀어서 알려주는 방법을 ( )(이)라고 합니다.', options: null, correct_answer: '정의', explanation: '정의는 어떤 말이나 개념의 뜻을 분명하게 밝혀 설명하는 방법입니다.', difficulty: 3 },
 
   // ============================================================
   // 국어 5. 의논하며 토의해요 (20문제)
@@ -376,6 +378,8 @@ export const seed2022Grade5OtherHard: QuestionSeed[] = [
   { grade: 5, subject: '국어', unit: '5. 의논하며 토의해요', unit_code: null, question_type: 'short_answer', question_text: '토의에서 찬성과 반대 의견을 모아 절충하는 방법을 무엇이라 하나요?', options: null, correct_answer: '절충', explanation: '절충은 서로 다른 의견의 좋은 점을 합쳐 모두가 어느 정도 만족할 수 있는 결론을 내는 방법입니다.', difficulty: 3 },
   { grade: 5, subject: '국어', unit: '5. 의논하며 토의해요', unit_code: null, question_type: 'ox', question_text: '토의 결과에 따르기로 했으면, 결과가 마음에 들지 않아도 따르는 것이 좋다.', options: ['O', 'X'], correct_answer: 'O', explanation: '토의를 통해 함께 정한 결론은 개인적으로 마음에 들지 않더라도 존중하고 따르는 것이 중요합니다.', difficulty: 3 },
   { grade: 5, subject: '국어', unit: '5. 의논하며 토의해요', unit_code: null, question_type: 'multiple_choice', question_text: '토의에서 다른 사람의 의견에 반대할 때 올바른 표현은?', options: ['"그건 완전 틀렸어!"', '"네 의견도 일리가 있지만, 나는 다르게 생각해. 왜냐하면~"', '"그건 말도 안 돼."', '"조용히 해."'], correct_answer: '"네 의견도 일리가 있지만, 나는 다르게 생각해. 왜냐하면~"', explanation: '상대방 의견을 인정하면서 자신의 다른 의견과 근거를 제시하는 것이 바른 토의 태도입니다.', difficulty: 3 },
+  { grade: 5, subject: '국어', unit: '5. 의논하며 토의해요', unit_code: null, question_type: 'multiple_choice', question_text: '합의와 다수결 중, 모든 사람의 의견을 최대한 반영하는 방법은?', options: ['합의', '다수결', '가위바위보', '제비뽑기'], correct_answer: '합의', explanation: '합의는 서로 양보하고 조정하여 모두가 동의하는 결론을 내는 것이므로, 다수결보다 모든 사람의 의견을 더 잘 반영합니다.', difficulty: 3 },
+  { grade: 5, subject: '국어', unit: '5. 의논하며 토의해요', unit_code: null, question_type: 'ox', question_text: '토의에서 진행자는 자신의 의견만 강하게 주장해도 된다.', options: ['O', 'X'], correct_answer: 'X', explanation: '진행자는 모든 참여자가 골고루 의견을 말할 수 있도록 도와야 하며, 자신의 의견만 주장해서는 안 됩니다.', difficulty: 3 },
 
   // ============================================================
   // 국어 6. 작품을 즐겨요 (20문제)
