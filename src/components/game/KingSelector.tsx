@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import StudentCard from './StudentCard';
 import { playKingSelectSuspense, playTeamSelect } from '@/lib/sounds';
-import { EyeOff, Crown, Check, Lock } from 'lucide-react';
+import { EyeOff, Crown, Check, Lock, User } from 'lucide-react';
 
 interface KingSelectorProps {
   selectingTeam: 'team_a' | 'team_b';
@@ -13,17 +13,27 @@ interface KingSelectorProps {
 
 export default function KingSelector({ selectingTeam }: KingSelectorProps) {
   const { teamA, teamB, selectKing, setPhase } = useGameStore();
+  const [step, setStep] = useState<'identify' | 'select' | 'confirmed'>('identify');
+  const [selectorName, setSelectorName] = useState<string | null>(null);
   const [selectedKing, setSelectedKing] = useState<string | null>(null);
-  const [confirmed, setConfirmed] = useState(false);
 
   const selectingTeamData = selectingTeam === 'team_a' ? teamA : teamB;
-  // 자기팀의 왕을 선택 (자기팀 학생 목록에서 왕을 고름)
-  const targetTeamData = selectingTeamData;
-  const targetTeamKey: 'team_a' | 'team_b' = selectingTeam;
+  const teamColor = selectingTeam === 'team_a' ? 'blue' : 'amber';
+  const teamColorClass = selectingTeam === 'team_a' ? 'text-blue-400' : 'text-amber-400';
 
   useEffect(() => {
     playKingSelectSuspense();
   }, []);
+
+  const handleIdentify = (student: string) => {
+    playTeamSelect();
+    setSelectorName(student);
+  };
+
+  const handleIdentifyConfirm = () => {
+    if (!selectorName) return;
+    setStep('select');
+  };
 
   const handleSelect = (student: string) => {
     playTeamSelect();
@@ -31,9 +41,9 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
   };
 
   const handleConfirm = () => {
-    if (!selectedKing) return;
-    selectKing(targetTeamKey, selectedKing);
-    setConfirmed(true);
+    if (!selectedKing || !selectorName) return;
+    selectKing(selectingTeam, selectedKing, selectorName);
+    setStep('confirmed');
 
     setTimeout(() => {
       if (selectingTeam === 'team_a') {
@@ -44,7 +54,8 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
     }, 2000);
   };
 
-  if (confirmed) {
+  // 확인 완료 화면
+  if (step === 'confirmed') {
     return (
       <motion.div
         className="flex flex-col items-center gap-6"
@@ -76,9 +87,87 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
     );
   }
 
+  // 1단계: 나는 누구인가요?
+  if (step === 'identify') {
+    return (
+      <div className="flex flex-col items-center gap-6 w-full">
+        <motion.div
+          className="flex items-center gap-3 glass rounded-xl px-6 py-3"
+          style={{ boxShadow: '0 0 20px rgba(250,204,21,0.1)' }}
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+        >
+          <motion.div
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+          >
+            <EyeOff className="w-6 h-6 text-yellow-400" />
+          </motion.div>
+          <span className="text-yellow-300 font-bold text-lg">
+            다른 학생들은 눈을 감아주세요!
+          </span>
+        </motion.div>
+
+        <motion.div
+          className="flex items-center gap-3"
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <User className="w-8 h-8 text-purple-400" />
+          <h2
+            className="text-3xl font-black text-white text-center"
+            style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+          >
+            <span className={teamColorClass}>{selectingTeamData.name}</span>
+            {' '}대표 학생!
+            <br />
+            나는 누구인가요?
+          </h2>
+        </motion.div>
+
+        <div className="flex flex-wrap justify-center gap-3">
+          <AnimatePresence>
+            {selectingTeamData.students.map((student, i) => (
+              <motion.div
+                key={student}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.3 + i * 0.05 }}
+              >
+                <StudentCard
+                  name={student}
+                  teamColor={teamColor}
+                  size="lg"
+                  isSelected={selectorName === student}
+                  onClick={() => handleIdentify(student)}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+
+        <motion.button
+          className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-2xl font-black text-xl disabled:opacity-40 disabled:cursor-not-allowed transition-shadow hover:shadow-lg hover:shadow-purple-500/20"
+          style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+          onClick={handleIdentifyConfirm}
+          disabled={!selectorName}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <Check className="w-6 h-6" />
+          나야!
+        </motion.button>
+      </div>
+    );
+  }
+
+  // 2단계: 왕을 선택하세요
   return (
-    <div className="flex flex-col items-center gap-6 w-full w-full">
-      {/* Warning banner */}
+    <div className="flex flex-col items-center gap-6 w-full">
       <motion.div
         className="flex items-center gap-3 glass rounded-xl px-6 py-3"
         style={{ boxShadow: '0 0 20px rgba(250,204,21,0.1)' }}
@@ -96,7 +185,6 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
         </span>
       </motion.div>
 
-      {/* Title */}
       <motion.h2
         className="text-3xl font-black text-white text-center"
         style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
@@ -104,18 +192,14 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        <span className={selectingTeam === 'team_a' ? 'text-blue-400' : 'text-amber-400'}>
-          {selectingTeamData.name}
-        </span>
-        {' '}대표 학생!
+        <span className={teamColorClass}>{selectorName}</span> 학생!
         <br />
-        우리 팀의 왕을 선택하세요
+        우리 팀의 왕을 선택하세요 👑
       </motion.h2>
 
-      {/* Student grid */}
       <div className="flex flex-wrap justify-center gap-3">
         <AnimatePresence>
-          {targetTeamData.students.map((student, i) => (
+          {selectingTeamData.students.map((student, i) => (
             <motion.div
               key={student}
               initial={{ scale: 0, opacity: 0 }}
@@ -124,7 +208,7 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
             >
               <StudentCard
                 name={student}
-                teamColor={selectingTeam === 'team_a' ? 'blue' : 'amber'}
+                teamColor={teamColor}
                 size="lg"
                 isSelected={selectedKing === student}
                 showCrown={selectedKing === student}
@@ -135,7 +219,6 @@ export default function KingSelector({ selectingTeam }: KingSelectorProps) {
         </AnimatePresence>
       </div>
 
-      {/* Confirm button */}
       <motion.button
         className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-white rounded-2xl font-black text-xl disabled:opacity-40 disabled:cursor-not-allowed transition-shadow hover:shadow-lg hover:shadow-yellow-500/20"
         style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}

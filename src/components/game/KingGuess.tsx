@@ -14,6 +14,8 @@ export default function KingGuess() {
     teamB,
     revealedA,
     revealedB,
+    kingSelectorA,
+    kingSelectorB,
     guessKing,
   } = useGameStore();
   const [selected, setSelected] = useState<string | null>(null);
@@ -21,6 +23,7 @@ export default function KingGuess() {
   const targetTeam = currentAttacker === 'team_a' ? 'team_b' : 'team_a';
   const targetTeamData = targetTeam === 'team_a' ? teamA : teamB;
   const revealed = targetTeam === 'team_a' ? revealedA : revealedB;
+  const kingSelector = targetTeam === 'team_a' ? kingSelectorA : kingSelectorB;
   const attackerName = currentAttacker === 'team_a' ? teamA.name : teamB.name;
   const attackerColor = currentAttacker === 'team_a' ? 'text-blue-400' : 'text-amber-400';
 
@@ -72,6 +75,22 @@ export default function KingGuess() {
           </span>
         )}
       </motion.p>
+
+      {/* 왕을 뽑은 사람 힌트 */}
+      {kingSelector && (
+        <motion.div
+          className="flex items-center gap-2 glass rounded-xl px-5 py-2.5"
+          style={{ boxShadow: '0 0 15px rgba(168,85,247,0.15)' }}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2, type: 'spring' }}
+        >
+          <span className="text-2xl">🕵️</span>
+          <span className="text-purple-300 font-bold text-lg">
+            <span className="text-white">{kingSelector}</span> 학생이 왕을 뽑았습니다
+          </span>
+        </motion.div>
+      )}
 
       {/* Student grid */}
       <div className="flex flex-wrap justify-center gap-3">

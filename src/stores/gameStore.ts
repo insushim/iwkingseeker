@@ -16,7 +16,7 @@ interface GameActions {
     teamAStudents: string[];
     teamBStudents: string[];
   }) => void;
-  selectKing: (team: 'team_a' | 'team_b', studentName: string) => void;
+  selectKing: (team: 'team_a' | 'team_b', studentName: string, selectorName?: string) => void;
   setRPSResult: (winner: 'team_a' | 'team_b') => void;
   setCurrentQuestion: (question: Question) => void;
   submitAnswer: (answer: string, isCorrect: boolean) => void;
@@ -35,6 +35,8 @@ const initialState: GameState = {
   teamB: { name: '백호', students: [], score: 0 },
   kingOfTeamA: null,
   kingOfTeamB: null,
+  kingSelectorA: null,
+  kingSelectorB: null,
   revealedA: [],
   revealedB: [],
   currentAttacker: 'team_a',
@@ -84,11 +86,11 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
       lastGuessedStudent: null,
     }),
 
-  selectKing: (team, studentName) => {
+  selectKing: (team, studentName, selectorName) => {
     if (team === 'team_a') {
-      set({ kingOfTeamA: studentName });
+      set({ kingOfTeamA: studentName, kingSelectorA: selectorName ?? null });
     } else {
-      set({ kingOfTeamB: studentName });
+      set({ kingOfTeamB: studentName, kingSelectorB: selectorName ?? null });
     }
   },
 
@@ -243,6 +245,8 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
     set({
       kingOfTeamA: null,
       kingOfTeamB: null,
+      kingSelectorA: null,
+      kingSelectorB: null,
       revealedA: [],
       revealedB: [],
       currentQuestion: null,

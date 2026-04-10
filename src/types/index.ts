@@ -99,6 +99,8 @@ export interface GameState {
   teamB: TeamState;
   kingOfTeamA: string | null;
   kingOfTeamB: string | null;
+  kingSelectorA: string | null;
+  kingSelectorB: string | null;
   revealedA: string[];
   revealedB: string[];
   currentAttacker: 'team_a' | 'team_b';
