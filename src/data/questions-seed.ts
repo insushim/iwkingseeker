@@ -205,20 +205,7 @@ const baseQuestions: QuestionSeed[] = [
   { grade: 5, subject: '수학', unit: '9. 합동과 대칭', unit_code: '[6수02-02]', question_type: 'ox', question_text: '선대칭 도형은 대칭축을 기준으로 접으면 완전히 겹친다.', options: ['O', 'X'], correct_answer: 'O', explanation: '선대칭 도형은 대칭축을 중심으로 반으로 접으면 완전히 겹칩니다.', difficulty: 1 },
   { grade: 5, subject: '수학', unit: '10. 소수의 곱셈', unit_code: '[6수01-07]', question_type: 'multiple_choice', question_text: '0.3 × 0.4 의 결과는?', options: ['0.12', '1.2', '0.7', '0.012'], correct_answer: '0.12', explanation: '3 × 4 = 12, 소수점 아래 자릿수의 합 = 2, 따라서 0.12', difficulty: 2 },
 
-  // ============================================================
-  // 5학년 국어
-  // ============================================================
-  { grade: 5, subject: '국어', unit: '1. 대화와 공감', unit_code: '[6국01-02]', question_type: 'multiple_choice', question_text: '대화할 때 상대의 마음을 이해하고 함께 느끼는 것을 무엇이라 하나요?', options: ['공감', '동정', '무시', '비판'], correct_answer: '공감', explanation: '공감은 상대방의 감정이나 의견에 대해 자기도 그렇다고 느끼는 것입니다.', difficulty: 1 },
-  { grade: 5, subject: '국어', unit: '1. 대화와 공감', unit_code: '[6국01-02]', question_type: 'ox', question_text: '대화할 때 상대방의 말을 끝까지 듣는 것은 공감의 첫걸음이다.', options: ['O', 'X'], correct_answer: 'O', explanation: '상대의 말을 끝까지 듣고 이해하려는 것이 공감의 기본입니다.', difficulty: 1 },
-  { grade: 5, subject: '국어', unit: '2. 작품을 감상해요', unit_code: '[6국05-01]', question_type: 'multiple_choice', question_text: '문학 작품을 감상하는 방법이 아닌 것은?', options: ['외워서 시험 보기', '인물의 마음 생각하기', '나의 경험과 비교하기', '인상 깊은 부분 찾기'], correct_answer: '외워서 시험 보기', explanation: '문학 감상은 작품 속 세계를 자유롭게 느끼고 생각하는 것입니다.', difficulty: 1 },
-  { grade: 5, subject: '국어', unit: '3. 글을 요약해요', unit_code: '[6국02-03]', question_type: 'multiple_choice', question_text: '글을 요약할 때 가장 먼저 해야 할 것은?', options: ['중심 내용 파악', '모든 문장 외우기', '글자 수 세기', '모르는 낱말 찾기'], correct_answer: '중심 내용 파악', explanation: '요약은 글의 중심 내용을 파악하고 핵심만 간추리는 것입니다.', difficulty: 2 },
-  { grade: 5, subject: '국어', unit: '4. 글쓰기의 과정', unit_code: '[6국03-01]', question_type: 'multiple_choice', question_text: '글쓰기 과정의 첫 단계는?', options: ['내용 생성하기', '고쳐 쓰기', '발표하기', '제목 정하기'], correct_answer: '내용 생성하기', explanation: '글쓰기는 내용 생성(아이디어 모으기) → 내용 조직 → 초고 쓰기 → 고쳐 쓰기 순서로 합니다.', difficulty: 2 },
-  { grade: 5, subject: '국어', unit: '5. 글쓴이의 주장', unit_code: '[6국02-04]', question_type: 'multiple_choice', question_text: '글쓴이의 주장을 파악할 때 확인해야 하는 것은?', options: ['주장과 근거', '글자 크기', '문단 수', '쪽수'], correct_answer: '주장과 근거', explanation: '글쓴이의 주장을 파악하려면 무엇을 주장하는지와 그 근거를 확인해야 합니다.', difficulty: 2 },
-  { grade: 5, subject: '국어', unit: '6. 토의하여 해결해요', unit_code: '[6국01-04]', question_type: 'ox', question_text: '토의에서는 다수결로만 의견을 결정해야 한다.', options: ['O', 'X'], correct_answer: 'X', explanation: '토의에서는 다양한 의견을 존중하고 합의를 이끌어내는 것이 중요합니다.', difficulty: 2 },
-  { grade: 5, subject: '국어', unit: '7. 기행문을 써요', unit_code: '[6국03-05]', question_type: 'multiple_choice', question_text: '기행문에 들어가야 할 내용이 아닌 것은?', options: ['미래 계획', '여행지 소개', '보고 느낀 점', '여행 경로'], correct_answer: '미래 계획', explanation: '기행문에는 여행지, 여행 경로, 보고 듣고 느낀 점 등을 씁니다.', difficulty: 1 },
-  { grade: 5, subject: '국어', unit: '8. 아는 것과 새로 안 것', unit_code: '[6국02-05]', question_type: 'ox', question_text: '글을 읽을 때 이미 아는 내용과 새로 알게 된 내용을 구별하면 이해가 잘 된다.', options: ['O', 'X'], correct_answer: 'O', explanation: '배경지식과 새 정보를 구별하면 글의 이해도가 높아집니다.', difficulty: 1 },
-  { grade: 5, subject: '국어', unit: '9. 여러 가지 매체 자료', unit_code: '[6국02-06]', question_type: 'multiple_choice', question_text: '다음 중 매체 자료가 아닌 것은?', options: ['연필', '텔레비전', '인터넷', '신문'], correct_answer: '연필', explanation: '매체 자료는 정보를 전달하는 수단으로, 텔레비전, 인터넷, 신문, 라디오 등이 있습니다.', difficulty: 1 },
-  { grade: 5, subject: '국어', unit: '10. 주인공이 되어', unit_code: '[6국05-03]', question_type: 'multiple_choice', question_text: '이야기 속 주인공의 마음을 이해하는 방법은?', options: ['주인공의 입장에서 생각하기', '줄거리만 외우기', '삽화만 보기', '작가 이름 찾기'], correct_answer: '주인공의 입장에서 생각하기', explanation: '주인공의 처지에서 생각하면 인물의 마음을 더 잘 이해할 수 있습니다.', difficulty: 1 },
+  // 5학년 국어: 2022 개정 국정교과서 → seed-2022-grade5-korean-1s-*.ts 파일에서 제공
 
   // ============================================================
   // 5학년 사회
@@ -373,8 +360,6 @@ const baseQuestions: QuestionSeed[] = [
   { grade: 5, subject: '과학', unit: '4. 용해와 용액', unit_code: '[6과04-01]', question_type: 'ox', question_text: '온도가 높을수록 물에 녹는 설탕의 양은 많아진다.', options: ['O', 'X'], correct_answer: 'O', explanation: '대부분의 고체 물질은 물의 온도가 높아질수록 더 많이 녹습니다.', difficulty: 2 },
   { grade: 5, subject: '과학', unit: '5. 다양한 생물과 우리 생활', unit_code: '[6과02-01]', question_type: 'ox', question_text: '세균은 맨눈으로 볼 수 없다.', options: ['O', 'X'], correct_answer: 'O', explanation: '세균은 매우 작아서 현미경으로만 관찰할 수 있습니다.', difficulty: 1 },
   { grade: 5, subject: '사회', unit: '3. 우리 경제의 성장과 발전', unit_code: '[6사03-01]', question_type: 'ox', question_text: '소비는 물건이나 서비스를 사서 사용하는 경제 활동이다.', options: ['O', 'X'], correct_answer: 'O', explanation: '소비는 생산된 물건이나 서비스를 구매하여 사용하는 활동입니다.', difficulty: 1 },
-  { grade: 5, subject: '국어', unit: '3. 글을 요약해요', unit_code: '[6국02-03]', question_type: 'ox', question_text: '요약할 때는 자신의 의견을 넣어서 쓴다.', options: ['O', 'X'], correct_answer: 'X', explanation: '요약은 글에 있는 내용의 핵심만 정리하는 것이지, 자신의 의견을 넣는 것이 아닙니다.', difficulty: 2 },
-
   // 추가 보충 문제 — 6학년
   { grade: 6, subject: '수학', unit: '1. 분수의 나눗셈', unit_code: '[6수01-08]', question_type: 'multiple_choice', question_text: '2/5 ÷ 1/3 의 결과는?', options: ['6/5', '2/15', '1/5', '3/10'], correct_answer: '6/5', explanation: '2/5 × 3/1 = 6/5', difficulty: 2 },
   { grade: 6, subject: '수학', unit: '3. 소수의 나눗셈', unit_code: '[6수01-09]', question_type: 'short_answer', question_text: '4.8 ÷ 1.2 의 결과는?', options: null, correct_answer: '4', explanation: '48 ÷ 12 = 4', difficulty: 1 },
