@@ -15,6 +15,9 @@ import { seed2022Grade5EnglishS2b } from './seed-2022-grade5-english-s2b';
 import { seed2022Grade5MathHard } from './seed-2022-grade5-math-hard';
 import { seed2022Grade5EnglishHard } from './seed-2022-grade5-english-hard';
 import { seed2022Grade5OtherHard } from './seed-2022-grade5-other-hard';
+import { seed2022Grade5MathHard2 } from './seed-2022-grade5-math-hard2';
+import { seed2022Grade5EnglishHard2 } from './seed-2022-grade5-english-hard2';
+import { seed2022Grade5OtherHard2 } from './seed-2022-grade5-other-hard2';
 // 2022 개정 국어 1학기 (2학기는 교과서 미출간으로 추후 추가)
 import { seed2022Grade5Korean1sU12 } from './seed-2022-grade5-korean-1s-u12';
 import { seed2022Grade5Korean1sU34 } from './seed-2022-grade5-korean-1s-u34';
@@ -378,6 +381,8 @@ export const questionsSeed: QuestionSeed[] = [
   ...seed2022Grade5EnglishS2a, ...seed2022Grade5EnglishS2b,
   ...seed2022Grade5MathHard,
   ...seed2022Grade5EnglishHard, ...seed2022Grade5OtherHard,
+  ...seed2022Grade5MathHard2,
+  ...seed2022Grade5EnglishHard2, ...seed2022Grade5OtherHard2,
   ...seed2022Grade5Korean1sU12, ...seed2022Grade5Korean1sU34, ...seed2022Grade5Korean1sU56,
 ].filter((q) => {
   const key = `${q.grade}-${q.subject}-${q.question_text}`;
