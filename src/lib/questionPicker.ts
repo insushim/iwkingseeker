@@ -25,19 +25,25 @@ export function pickQuestion(
 
   const difficultyMatched = leastUsed.filter((q) => q.difficulty === targetDifficulty);
 
+  // 유형 가중치 — 시드 데이터가 객관식에 편중돼 있어
+  // OX/빈칸이 충분히 나오도록 가중치로 보정 (mc 2 : ox 3 : fill_blank 3)
+  const typeWeights: Array<'multiple_choice' | 'ox' | 'fill_blank'> = [
+    'multiple_choice', 'multiple_choice',
+    'ox', 'ox', 'ox',
+    'fill_blank', 'fill_blank', 'fill_blank',
+  ];
+
+  const tryPools: Question[][] = [];
   if (difficultyMatched.length > 0) {
-    // 같은 난이도 내에서도 유형 다양화 — 가장 적게 나온 유형 우선
-    const typeCount = new Map<string, number>();
-    for (const q of difficultyMatched) {
-      typeCount.set(q.question_type, (typeCount.get(q.question_type) || 0) + q.used_count);
-    }
-    const minTypeUsed = Math.min(...Array.from(typeCount.values()));
-    const leastUsedTypes = Array.from(typeCount.entries())
-      .filter(([, c]) => c === minTypeUsed)
-      .map(([t]) => t);
-    const preferredType = leastUsedTypes[Math.floor(Math.random() * leastUsedTypes.length)]!;
-    const finalPick = difficultyMatched.filter((q) => q.question_type === preferredType);
-    return shuffleArray(finalPick)[0] || shuffleArray(difficultyMatched)[0]!;
+    const targetType = typeWeights[Math.floor(Math.random() * typeWeights.length)]!;
+    const byType = difficultyMatched.filter((q) => q.question_type === targetType);
+    if (byType.length > 0) tryPools.push(byType);
+    tryPools.push(difficultyMatched);
+  }
+  tryPools.push(leastUsed);
+
+  for (const pool2 of tryPools) {
+    if (pool2.length > 0) return shuffleArray(pool2)[0]!;
   }
 
   return shuffleArray(leastUsed)[0]!;
