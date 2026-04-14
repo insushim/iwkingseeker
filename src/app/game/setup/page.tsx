@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useGameStore } from '@/stores/gameStore';
 import { GRADES, SUBJECTS, CURRICULUM_UNITS, TARGET_SCORES, TIMER_OPTIONS, TEAM_DEFAULTS } from '@/lib/constants';
 import { splitIntoTeams } from '@/lib/utils';
 import { playButtonClick, playPhaseTransition } from '@/lib/sounds';
 import { convertToMultipleChoice } from '@/lib/questionConverter';
+import { getCustomQuestionsFiltered, toRuntimeQuestion } from '@/lib/customQuestions';
 import { Crown, ChevronRight, Users, BookOpen, Settings, Play, Save, FolderOpen, Trash2, Check, Gamepad2 } from 'lucide-react';
 
 interface SavedClass {
@@ -47,10 +49,19 @@ export default function GameSetupPage() {
   const [teamBName, setTeamBName] = useState(TEAM_DEFAULTS.B.name);
   const [savedClasses, setSavedClasses] = useState<SavedClass[]>([]);
   const [className, setClassName] = useState('');
+  const [customCount, setCustomCount] = useState(0);
 
   useEffect(() => {
     setSavedClasses(getSavedClasses());
   }, []);
+
+  useEffect(() => {
+    if (!unit) {
+      setCustomCount(0);
+      return;
+    }
+    setCustomCount(getCustomQuestionsFiltered(grade, subject, unit).length);
+  }, [grade, subject, unit]);
 
   const handleStepChange = (newStep: Step) => {
     playButtonClick();
@@ -121,8 +132,14 @@ export default function GameSetupPage() {
       created_at: new Date().toISOString(),
     }));
 
-    // 주관식/빈칸 → 객관식 자동 변환 + 셔플
-    const converted = convertToMultipleChoice(rawPool);
+    // 내 문제(커스텀) 병합 - 같은 학년/과목/단원만
+    const customRuntime = getCustomQuestionsFiltered(grade, subject, unit).map((c) => ({
+      ...toRuntimeQuestion(c),
+    }));
+
+    // 주관식/빈칸 → 객관식 자동 변환 + 셔플 (커스텀 포함)
+    const merged = [...customRuntime, ...rawPool] as typeof rawPool;
+    const converted = convertToMultipleChoice(merged);
     const pool = converted.sort(() => Math.random() - 0.5);
 
     setQuestionPool(pool);
@@ -316,7 +333,14 @@ export default function GameSetupPage() {
                 </div>
 
                 <div>
-                  <label className="text-lg text-gray-400 block mb-3 font-medium">단원</label>
+                  <div className="flex items-baseline justify-between mb-3">
+                    <label className="text-lg text-gray-400 font-medium">단원</label>
+                    {unit && customCount > 0 && (
+                      <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded-lg font-bold">
+                        ✨ 내 문제 {customCount}개 포함
+                      </span>
+                    )}
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2">
                     {units.map((u) => (
                       <motion.button
@@ -334,6 +358,12 @@ export default function GameSetupPage() {
                       </motion.button>
                     ))}
                   </div>
+                  <Link
+                    href="/questions/create"
+                    className="mt-3 inline-flex items-center gap-2 text-sm text-purple-300 hover:text-purple-200 underline underline-offset-4"
+                  >
+                    + 이 단원에 내 문제 만들기
+                  </Link>
                 </div>
 
                 <motion.button

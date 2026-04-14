@@ -137,18 +137,31 @@ export default function LandingPage() {
           </div>
           <span className="text-xl font-bold text-white tracking-tight">KingSeeker</span>
         </motion.div>
-        <Link href="/game/setup">
-          <motion.button
-            className="px-6 py-2.5 glass-strong rounded-xl font-bold text-white hover:bg-white/10 transition-colors"
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            게임 시작
-          </motion.button>
-        </Link>
+        <motion.div
+          className="flex items-center gap-2"
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Link href="/questions/create">
+            <motion.button
+              className="px-4 py-2.5 glass rounded-xl font-bold text-sm text-purple-200 hover:bg-white/10 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              ✨ 내 문제 만들기
+            </motion.button>
+          </Link>
+          <Link href="/game/setup">
+            <motion.button
+              className="px-6 py-2.5 glass-strong rounded-xl font-bold text-white hover:bg-white/10 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              게임 시작
+            </motion.button>
+          </Link>
+        </motion.div>
       </header>
 
       {/* Hero */}
