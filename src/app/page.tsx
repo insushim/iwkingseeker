@@ -111,7 +111,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-mesh bg-mesh-animated overflow-hidden relative noise-overlay">
+    <div className="min-h-screen bg-mesh bg-mesh-animated overflow-x-hidden relative noise-overlay">
       <StarField />
 
       {/* Floating ambient orbs */}
