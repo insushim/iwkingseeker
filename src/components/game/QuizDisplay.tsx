@@ -7,6 +7,9 @@ import Timer from './Timer';
 import { playCorrectSound, playWrongSound } from '@/lib/sounds';
 import { cn } from '@/lib/utils';
 import { Sparkles, Zap, HelpCircle } from 'lucide-react';
+import WhackAMole from './quiz-modes/WhackAMole';
+import SpinWheel from './quiz-modes/SpinWheel';
+import MatchingPairs from './quiz-modes/MatchingPairs';
 
 /**
  * 문제 표시 스타일:
@@ -14,8 +17,11 @@ import { Sparkles, Zap, HelpCircle } from 'lucide-react';
  * 'list'    — 세로 리스트 (순서대로 등장)
  * 'bigcard' — 큰 카드 (한 줄씩 크게)
  * 'speed'   — 스피드 퀴즈 (번호 대형)
+ * 'whack'   — 두더지 잡기
+ * 'wheel'   — 룰렛
+ * 'cards'   — 카드 뒤집기
  */
-type QuizStyle = 'grid' | 'list' | 'bigcard' | 'speed';
+type QuizStyle = 'grid' | 'list' | 'bigcard' | 'speed' | 'whack' | 'wheel' | 'cards';
 
 const STYLE_COLORS = [
   { bg: 'bg-red-600/80 hover:bg-red-500/90 border-red-400/40', glow: 'hover:shadow-red-500/20 hover:shadow-lg', label: 'A' },
@@ -105,10 +111,16 @@ export default function QuizDisplay() {
   const attackerEmoji = currentAttacker === 'team_a' ? '🐲' : '🐯';
 
   // 문제마다 다른 스타일 - 문제 번호 기반으로 순환
+  // 게임 스타일(whack/wheel/cards)은 4지선다일 때만 의미가 있음
   const quizStyle: QuizStyle = useMemo(() => {
-    const styles: QuizStyle[] = ['grid', 'list', 'bigcard', 'speed'];
+    const isFourChoice =
+      currentQuestion?.question_type === 'multiple_choice' &&
+      (currentQuestion?.options?.length ?? 0) === 4;
+    const styles: QuizStyle[] = isFourChoice
+      ? ['grid', 'whack', 'list', 'wheel', 'bigcard', 'cards', 'speed']
+      : ['grid', 'list', 'bigcard', 'speed'];
     return styles[totalQuestionsAsked % styles.length]!;
-  }, [totalQuestionsAsked]);
+  }, [totalQuestionsAsked, currentQuestion]);
 
   // 초성 힌트
   const chosungHint = useMemo(() => {
@@ -164,7 +176,21 @@ export default function QuizDisplay() {
   const q = currentQuestion!;
   const isOX = q.question_type === 'ox';
   const options = q.options ?? [];
-  const styleLabel = isOX ? 'OX' : quizStyle === 'grid' ? '4지선다' : quizStyle === 'list' ? '리스트' : quizStyle === 'bigcard' ? '카드' : '스피드';
+  const styleLabel = isOX
+    ? 'OX'
+    : quizStyle === 'grid'
+    ? '4지선다'
+    : quizStyle === 'list'
+    ? '리스트'
+    : quizStyle === 'bigcard'
+    ? '카드'
+    : quizStyle === 'speed'
+    ? '스피드'
+    : quizStyle === 'whack'
+    ? '🔨 두더지'
+    : quizStyle === 'wheel'
+    ? '🎯 룰렛'
+    : '🃏 뒤집기';
 
   return (
     <div className="flex flex-col gap-4 w-full h-full">
@@ -329,6 +355,33 @@ export default function QuizDisplay() {
             );
           })}
         </div>
+      ) : quizStyle === 'whack' ? (
+        <WhackAMole
+          options={options}
+          correctAnswer={q.correct_answer}
+          selectedAnswer={selectedAnswer}
+          showResult={showResult}
+          isCorrect={isCorrect}
+          onAnswer={handleAnswer}
+        />
+      ) : quizStyle === 'wheel' ? (
+        <SpinWheel
+          options={options}
+          correctAnswer={q.correct_answer}
+          selectedAnswer={selectedAnswer}
+          showResult={showResult}
+          isCorrect={isCorrect}
+          onAnswer={handleAnswer}
+        />
+      ) : quizStyle === 'cards' ? (
+        <MatchingPairs
+          options={options}
+          correctAnswer={q.correct_answer}
+          selectedAnswer={selectedAnswer}
+          showResult={showResult}
+          isCorrect={isCorrect}
+          onAnswer={handleAnswer}
+        />
       ) : quizStyle === 'bigcard' ? (
         /* 빅카드 — 큰 카드 2x2지만 더 두꺼운 스타일 */
         <div className="grid grid-cols-2 gap-4 w-full flex-1">

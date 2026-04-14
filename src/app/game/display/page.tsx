@@ -7,6 +7,9 @@ import { useFullscreen } from '@/hooks/useFullscreen';
 import { cn } from '@/lib/utils';
 import { DISPLAY_CHANNEL } from '@/lib/displayChannel';
 import type { DisplayState } from '@/lib/displayChannel';
+import WhackAMole from '@/components/game/quiz-modes/WhackAMole';
+import SpinWheel from '@/components/game/quiz-modes/SpinWheel';
+import MatchingPairs from '@/components/game/quiz-modes/MatchingPairs';
 
 /* ──────────────────────────────────────
    Scoreboard (props-driven, no Zustand)
@@ -223,7 +226,7 @@ const STYLE_COLORS = [
 
 const STYLE_EMOJIS = ['🔴', '🔵', '🟢', '🟡'];
 
-type QuizStyle = 'grid' | 'list' | 'bigcard' | 'speed';
+type QuizStyle = 'grid' | 'list' | 'bigcard' | 'speed' | 'whack' | 'wheel' | 'cards';
 
 /* ──────────────────────────────────────
    Phase-specific display sections
@@ -386,10 +389,27 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
   const options = q.options ?? [];
 
   const quizStyle: QuizStyle = (() => {
-    const styles: QuizStyle[] = ['grid', 'list', 'bigcard', 'speed'];
+    const isFourChoice = q.question_type === 'multiple_choice' && (q.options?.length ?? 0) === 4;
+    const styles: QuizStyle[] = isFourChoice
+      ? ['grid', 'whack', 'list', 'wheel', 'bigcard', 'cards', 'speed']
+      : ['grid', 'list', 'bigcard', 'speed'];
     return styles[state.totalQuestionsAsked % styles.length]!;
   })();
-  const styleLabel = isOX ? 'OX' : quizStyle === 'grid' ? '4지선다' : quizStyle === 'list' ? '리스트' : quizStyle === 'bigcard' ? '카드' : '스피드';
+  const styleLabel = isOX
+    ? 'OX'
+    : quizStyle === 'grid'
+    ? '4지선다'
+    : quizStyle === 'list'
+    ? '리스트'
+    : quizStyle === 'bigcard'
+    ? '카드'
+    : quizStyle === 'speed'
+    ? '스피드'
+    : quizStyle === 'whack'
+    ? '🔨 두더지'
+    : quizStyle === 'wheel'
+    ? '🎯 룰렛'
+    : '🃏 뒤집기';
 
   return (
     <div className="flex flex-col gap-4 w-full h-full">
@@ -510,6 +530,33 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
             );
           })}
         </div>
+      ) : quizStyle === 'whack' ? (
+        <WhackAMole
+          options={options}
+          correctAnswer=""
+          selectedAnswer={null}
+          showResult={false}
+          isCorrect={false}
+          onAnswer={sendAnswer}
+        />
+      ) : quizStyle === 'wheel' ? (
+        <SpinWheel
+          options={options}
+          correctAnswer=""
+          selectedAnswer={null}
+          showResult={false}
+          isCorrect={false}
+          onAnswer={sendAnswer}
+        />
+      ) : quizStyle === 'cards' ? (
+        <MatchingPairs
+          options={options}
+          correctAnswer=""
+          selectedAnswer={null}
+          showResult={false}
+          isCorrect={false}
+          onAnswer={sendAnswer}
+        />
       ) : quizStyle === 'bigcard' ? (
         <div className="grid grid-cols-2 gap-4 w-full flex-1">
           {options.map((option, i) => {
