@@ -152,9 +152,9 @@ export default function LandingPage() {
       </header>
 
       {/* Hero */}
-      <main className="relative z-10 flex flex-col items-center justify-center px-4 pt-12 pb-32">
+      <main className="relative z-10 flex flex-col items-center px-4 pt-6 md:pt-10 pb-24">
         <motion.div
-          className="flex flex-col items-center gap-8 text-center"
+          className="flex flex-col items-center gap-4 md:gap-6 text-center"
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -162,29 +162,29 @@ export default function LandingPage() {
           {/* Crown with glow */}
           <div className="relative">
             <motion.span
-              className="text-8xl md:text-9xl block animate-crown"
+              className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl block animate-crown"
               style={{ filter: 'drop-shadow(0 0 30px rgba(250,204,21,0.4))' }}
             >
               👑
             </motion.span>
             <motion.div
-              className="absolute -inset-8 rounded-full"
+              className="absolute -inset-6 rounded-full"
               style={{ background: 'radial-gradient(circle, rgba(250,204,21,0.15), transparent 70%)' }}
               animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
               transition={{ duration: 3, repeat: Infinity }}
             />
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-2 md:space-y-3">
             <h1
-              className="text-6xl md:text-8xl lg:text-9xl font-black text-gradient-gold tracking-tight"
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-gradient-gold tracking-tight"
               style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
             >
               킹시커
             </h1>
 
             <motion.p
-              className="text-xl md:text-2xl text-purple-200/90 font-medium tracking-wide"
+              className="text-base sm:text-lg md:text-2xl text-purple-200/90 font-medium tracking-wide"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -194,7 +194,7 @@ export default function LandingPage() {
           </div>
 
           <motion.p
-            className="text-gray-400/90 max-w-lg text-lg leading-relaxed"
+            className="hidden sm:block text-gray-400/90 max-w-lg text-base md:text-lg leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -212,7 +212,7 @@ export default function LandingPage() {
           >
             <Link href="/game/setup">
               <motion.button
-                className="group relative mt-2 px-12 py-5 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-600 text-white rounded-2xl font-black text-2xl overflow-hidden"
+                className="group relative mt-1 px-8 md:px-12 py-3 md:py-5 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-600 text-white rounded-2xl font-black text-xl md:text-2xl overflow-hidden"
                 style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -241,7 +241,7 @@ export default function LandingPage() {
 
           {/* Stats */}
           <motion.div
-            className="flex items-center gap-8 mt-4"
+            className="flex items-center gap-4 md:gap-8 mt-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9 }}
@@ -263,7 +263,7 @@ export default function LandingPage() {
         </motion.div>
 
         {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 max-w-5xl w-full px-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 md:mt-20 max-w-5xl w-full px-4">
           {features.map((feature, i) => (
             <motion.div
               key={feature.title}
