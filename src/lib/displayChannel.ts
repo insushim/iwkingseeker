@@ -26,6 +26,10 @@ export interface DisplayState {
   lastGuessResult: 'found' | 'not_found' | null;
   lastGuessedStudent: string | null;
   roundHistory: RoundRecord[];
+  revealedA: string[];
+  revealedB: string[];
+  kingSelectorA: string | null;
+  kingSelectorB: string | null;
 }
 
 export interface DisplayMessage {
@@ -36,8 +40,8 @@ export interface DisplayMessage {
 /** 학생 화면 → 교사 화면으로 보내는 액션 */
 export interface DisplayAction {
   type: 'action';
-  action: 'answer';
-  value: string; // 선택한 답
+  action: 'answer' | 'rps-winner' | 'king-guess';
+  value: string;
 }
 
 /**
@@ -68,5 +72,9 @@ export function sanitizeForDisplay(s: GameState): DisplayState {
     lastGuessResult: s.lastGuessResult,
     lastGuessedStudent: s.lastGuessedStudent,
     roundHistory: s.roundHistory,
+    revealedA: s.revealedA,
+    revealedB: s.revealedB,
+    kingSelectorA: s.kingSelectorA,
+    kingSelectorB: s.kingSelectorB,
   };
 }

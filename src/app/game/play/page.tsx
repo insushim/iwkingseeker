@@ -75,6 +75,20 @@ export default function GamePlayPage() {
       if (e.data?.type === 'action' && e.data?.action === 'answer') {
         window.dispatchEvent(new CustomEvent('display-answer', { detail: e.data.value }));
       }
+      // 학생 화면에서 가위바위보 결과 선택
+      if (e.data?.type === 'action' && e.data?.action === 'rps-winner') {
+        const winner = e.data.value as 'team_a' | 'team_b';
+        if (winner === 'team_a' || winner === 'team_b') {
+          useGameStore.getState().setRPSResult(winner);
+        }
+      }
+      // 학생 화면에서 왕 지목
+      if (e.data?.type === 'action' && e.data?.action === 'king-guess') {
+        const current = useGameStore.getState();
+        if (current.phase === 'GUESS_KING' && typeof e.data.value === 'string') {
+          current.guessKing(e.data.value);
+        }
+      }
     };
 
     // Send initial state immediately (in case display is already open)

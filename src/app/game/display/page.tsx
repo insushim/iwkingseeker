@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Maximize, Minimize, Lock, Crosshair, ArrowRightLeft, Trophy, Crown, Swords, Zap, Sparkles, ShieldX } from 'lucide-react';
+import { Maximize, Minimize, Lock, Crosshair, ArrowRightLeft, Trophy, Crown, Swords, Zap, ShieldX, Target } from 'lucide-react';
 import { useFullscreen } from '@/hooks/useFullscreen';
 import { cn } from '@/lib/utils';
 import { DISPLAY_CHANNEL } from '@/lib/displayChannel';
@@ -10,6 +10,7 @@ import type { DisplayState } from '@/lib/displayChannel';
 import WhackAMole from '@/components/game/quiz-modes/WhackAMole';
 import SpinWheel from '@/components/game/quiz-modes/SpinWheel';
 import MatchingPairs from '@/components/game/quiz-modes/MatchingPairs';
+import StudentCard from '@/components/game/StudentCard';
 
 /* ──────────────────────────────────────
    Scoreboard (props-driven, no Zustand)
@@ -327,7 +328,19 @@ function KingSelectWaiting({ teamName }: { teamName: string }) {
   );
 }
 
-function RPSWaiting({ teamAName, teamBName }: { teamAName: string; teamBName: string }) {
+function DisplayRPS({ teamAName, teamBName, channelRef }: {
+  teamAName: string;
+  teamBName: string;
+  channelRef: React.RefObject<BroadcastChannel | null>;
+}) {
+  const [selecting, setSelecting] = useState(false);
+
+  const pickWinner = (winner: 'team_a' | 'team_b') => {
+    if (selecting) return;
+    setSelecting(true);
+    channelRef.current?.postMessage({ type: 'action', action: 'rps-winner', value: winner });
+  };
+
   return (
     <div className="flex flex-col items-center justify-center gap-8">
       <motion.div
@@ -344,15 +357,46 @@ function RPSWaiting({ teamAName, teamBName }: { teamAName: string; teamBName: st
         </h2>
         <Zap className="w-8 h-8 text-yellow-400" />
       </motion.div>
+
+      <motion.p
+        className="text-xl text-gray-300"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        양 팀 대표가 직접 가위바위보를 한 뒤, 이긴 팀을 선택하세요
+      </motion.p>
+
       <div className="flex items-center gap-8">
-        <motion.div
-          className="flex flex-col items-center gap-3 glass-blue rounded-2xl px-12 py-8"
-          animate={{ y: [0, -6, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
+        <motion.button
+          className="group flex flex-col items-center gap-4 px-16 py-10 glass-blue rounded-2xl transition-all hover:bg-blue-500/15 cursor-pointer disabled:opacity-50"
+          onClick={() => pickWinner('team_a')}
+          whileHover={{ scale: 1.05, y: -4 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ x: -50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          disabled={selecting}
         >
-          <span className="text-6xl">🐲</span>
-          <span className="text-2xl font-black text-blue-400" style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}>{teamAName}</span>
-        </motion.div>
+          <motion.span
+            className="text-7xl"
+            animate={{ rotate: [0, -5, 5, 0] }}
+            transition={{ repeat: Infinity, duration: 3 }}
+          >
+            🐲
+          </motion.span>
+          <span
+            className="text-3xl font-black text-blue-400"
+            style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+          >
+            {teamAName}
+          </span>
+          <div className="flex items-center gap-2 text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Crown className="w-5 h-5" style={{ filter: 'drop-shadow(0 0 4px rgba(250,204,21,0.5))' }} />
+            <span className="font-bold">승리!</span>
+          </div>
+        </motion.button>
+
         <motion.span
           className="text-4xl font-black text-gradient-fire"
           style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
@@ -361,16 +405,38 @@ function RPSWaiting({ teamAName, teamBName }: { teamAName: string; teamBName: st
         >
           VS
         </motion.span>
-        <motion.div
-          className="flex flex-col items-center gap-3 glass-amber rounded-2xl px-12 py-8"
-          animate={{ y: [0, -6, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, delay: 0.75 }}
+
+        <motion.button
+          className="group flex flex-col items-center gap-4 px-16 py-10 glass-amber rounded-2xl transition-all hover:bg-amber-500/15 cursor-pointer disabled:opacity-50"
+          onClick={() => pickWinner('team_b')}
+          whileHover={{ scale: 1.05, y: -4 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ x: 50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          disabled={selecting}
         >
-          <span className="text-6xl">🐯</span>
-          <span className="text-2xl font-black text-amber-400" style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}>{teamBName}</span>
-        </motion.div>
+          <motion.span
+            className="text-7xl"
+            animate={{ rotate: [0, 5, -5, 0] }}
+            transition={{ repeat: Infinity, duration: 3 }}
+          >
+            🐯
+          </motion.span>
+          <span
+            className="text-3xl font-black text-amber-400"
+            style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+          >
+            {teamBName}
+          </span>
+          <div className="flex items-center gap-2 text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Crown className="w-5 h-5" style={{ filter: 'drop-shadow(0 0 4px rgba(250,204,21,0.5))' }} />
+            <span className="font-bold">승리!</span>
+          </div>
+        </motion.button>
       </div>
-      <p className="text-xl text-gray-300">양 팀 대표가 가위바위보 진행 중...</p>
+
+      <p className="text-sm text-gray-500 mt-4">선공팀이 먼저 퀴즈를 풀 수 있습니다</p>
     </div>
   );
 }
@@ -668,45 +734,117 @@ function DisplayWrongAnswer({ state }: { state: DisplayState }) {
   );
 }
 
-function GuessKingWaiting({ attackerName }: { attackerName: string }) {
+function DisplayKingGuess({ state, channelRef }: {
+  state: DisplayState;
+  channelRef: React.RefObject<BroadcastChannel | null>;
+}) {
+  const [selected, setSelected] = useState<string | null>(null);
+  const [confirmed, setConfirmed] = useState(false);
+
+  const targetTeam = state.currentAttacker === 'team_a' ? 'team_b' : 'team_a';
+  const targetTeamData = targetTeam === 'team_a' ? state.teamA : state.teamB;
+  const revealed = targetTeam === 'team_a' ? state.revealedA : state.revealedB;
+  const kingSelector = targetTeam === 'team_a' ? state.kingSelectorA : state.kingSelectorB;
+  const attackerName = state.currentAttacker === 'team_a' ? state.teamA.name : state.teamB.name;
+  const attackerColor = state.currentAttacker === 'team_a' ? 'text-blue-400' : 'text-amber-400';
+
+  const unrevealed = targetTeamData.students.filter((s) => !revealed.includes(s));
+
+  const handleConfirm = () => {
+    if (!selected || confirmed) return;
+    setConfirmed(true);
+    channelRef.current?.postMessage({ type: 'action', action: 'king-guess', value: selected });
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center gap-8">
+    <div className="flex flex-col items-center gap-6 w-full">
       <motion.div
-        className="relative p-8 rounded-full glass-strong"
-        style={{ boxShadow: '0 0 40px rgba(239,68,68,0.15)' }}
-        animate={{ scale: [1, 1.06, 1] }}
-        transition={{ duration: 1.5, repeat: Infinity }}
+        className="flex items-center gap-3"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
       >
-        <Crosshair className="w-20 h-20 text-red-400" style={{ filter: 'drop-shadow(0 0 15px rgba(239,68,68,0.5))' }} />
         <motion.div
-          className="absolute inset-0 rounded-full border-2 border-red-500/30"
-          animate={{ scale: [1, 1.25], opacity: [0.5, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        />
+          animate={{ rotate: [0, 360] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+        >
+          <Crosshair className="w-8 h-8 text-yellow-400" />
+        </motion.div>
+        <h2
+          className="text-4xl font-black text-white"
+          style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+        >
+          정답! 상대팀의 왕을 지목하세요!
+        </h2>
       </motion.div>
-      <h2
-        className="text-5xl font-black text-white text-center"
-        style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
-      >
-        상대팀의 왕을 지목하는 중...
-      </h2>
+
       <motion.p
-        className="text-2xl text-red-300/80 font-bold"
-        animate={{ opacity: [0.6, 1, 0.6] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        className="text-gray-400"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
       >
-        {attackerName} 팀이 왕을 추리하고 있습니다
+        <span className={attackerColor}>{attackerName}</span>
+        , {targetTeamData.name}의 왕은 누구일까요?
+        {unrevealed.length < targetTeamData.students.length && (
+          <span className="ml-2 text-gray-500 text-sm">
+            (남은 후보: {unrevealed.length}명)
+          </span>
+        )}
       </motion.p>
-      <div className="flex gap-2 mt-2">
-        {[0, 1, 2].map((i) => (
-          <motion.div
-            key={i}
-            className="w-4 h-4 rounded-full bg-red-500"
-            animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
-            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.3 }}
-          />
-        ))}
+
+      {kingSelector && (
+        <motion.div
+          className="flex items-center gap-2 glass rounded-xl px-5 py-2.5"
+          style={{ boxShadow: '0 0 15px rgba(168,85,247,0.15)' }}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2, type: 'spring' }}
+        >
+          <span className="text-2xl">🕵️</span>
+          <span className="text-purple-300 font-bold text-lg">
+            <span className="text-white">{kingSelector}</span> 학생이 왕을 뽑았습니다
+          </span>
+        </motion.div>
+      )}
+
+      <div className="flex flex-wrap justify-center gap-3">
+        {targetTeamData.students.map((student, i) => {
+          const isRevealed = revealed.includes(student);
+          return (
+            <motion.div
+              key={student}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.15 + i * 0.04 }}
+            >
+              <StudentCard
+                name={student}
+                teamColor={targetTeam === 'team_a' ? 'blue' : 'amber'}
+                size="lg"
+                isRevealed={isRevealed}
+                isSelected={selected === student}
+                isDisabled={isRevealed || confirmed}
+                onClick={() => !isRevealed && !confirmed && setSelected(student)}
+              />
+            </motion.div>
+          );
+        })}
       </div>
+
+      <motion.button
+        className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white rounded-2xl font-black text-xl disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-shadow hover:shadow-lg hover:shadow-red-500/20"
+        style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+        onClick={handleConfirm}
+        disabled={!selected || confirmed}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        <Target className="w-6 h-6" />
+        이 학생이 왕이다!
+      </motion.button>
     </div>
   );
 }
@@ -998,15 +1136,13 @@ export default function DisplayPage() {
       case 'KING_SELECT_B':
         return <KingSelectWaiting teamName={gameState.teamB.name} />;
       case 'RPS':
-        return <RPSWaiting teamAName={gameState.teamA.name} teamBName={gameState.teamB.name} />;
+        return <DisplayRPS teamAName={gameState.teamA.name} teamBName={gameState.teamB.name} channelRef={channelRef} />;
       case 'QUIZ':
         return <DisplayQuiz state={gameState} channelRef={channelRef} />;
       case 'WRONG_ANSWER':
         return <DisplayWrongAnswer state={gameState} />;
-      case 'GUESS_KING': {
-        const attackerName = gameState.currentAttacker === 'team_a' ? gameState.teamA.name : gameState.teamB.name;
-        return <GuessKingWaiting attackerName={attackerName} />;
-      }
+      case 'GUESS_KING':
+        return <DisplayKingGuess state={gameState} channelRef={channelRef} />;
       case 'ROUND_RESULT':
         return <DisplayRoundResult state={gameState} />;
       case 'NEW_ROUND':
