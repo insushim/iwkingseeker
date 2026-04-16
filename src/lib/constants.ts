@@ -5,6 +5,14 @@ export const APP_SUBTITLE = '왕을 찾아라! 교실 퀴즈 배틀';
 export const GRADES = [3, 4, 5, 6] as const;
 export type Grade = (typeof GRADES)[number];
 
+export const GRADE_BANDS = [
+  { key: '3-4', label: '3-4학년군', grades: [3, 4] as const },
+  { key: '5-6', label: '5-6학년군', grades: [5, 6] as const },
+] as const;
+export type GradeBandKey = (typeof GRADE_BANDS)[number]['key'];
+
+export const NATIONAL_SUBJECTS: readonly string[] = ['국어', '도덕'];
+
 export const SUBJECTS = ['국어', '수학', '사회', '과학', '영어', '도덕'] as const;
 export type Subject = (typeof SUBJECTS)[number];
 

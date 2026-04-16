@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useGameStore } from '@/stores/gameStore';
-import { GRADES, SUBJECTS, CURRICULUM_UNITS, TARGET_SCORES, TIMER_OPTIONS, TEAM_DEFAULTS } from '@/lib/constants';
+import { GRADES, SUBJECTS, CURRICULUM_UNITS, TARGET_SCORES, TIMER_OPTIONS, TEAM_DEFAULTS, GRADE_BANDS, NATIONAL_SUBJECTS, type GradeBandKey } from '@/lib/constants';
 import { splitIntoTeams } from '@/lib/utils';
 import { playButtonClick, playPhaseTransition } from '@/lib/sounds';
 import { convertToMultipleChoice } from '@/lib/questionConverter';
@@ -40,9 +40,14 @@ export default function GameSetupPage() {
   const { initGame, setQuestionPool } = useGameStore();
   const [step, setStep] = useState<Step>(1);
   const [studentInput, setStudentInput] = useState('');
-  const [grade, setGrade] = useState<number>(5);
+  const [gradeBand, setGradeBand] = useState<GradeBandKey>('5-6');
+  const [subGrade, setSubGrade] = useState<number>(5);
   const [subject, setSubject] = useState<string>('수학');
   const [unit, setUnit] = useState<string>('');
+
+  const band = GRADE_BANDS.find((b) => b.key === gradeBand)!;
+  const isNational = NATIONAL_SUBJECTS.includes(subject);
+  const grade = isNational ? subGrade : band.grades[0];
   const [targetScore, setTargetScore] = useState(3);
   const [timerSeconds, setTimerSeconds] = useState(30);
   const [teamAName, setTeamAName] = useState(TEAM_DEFAULTS.A.name);
@@ -60,8 +65,9 @@ export default function GameSetupPage() {
       setCustomCount(0);
       return;
     }
-    setCustomCount(getCustomQuestionsFiltered(grade, subject, unit).length);
-  }, [grade, subject, unit]);
+    const g = isNational ? subGrade : band.grades[0];
+    setCustomCount(getCustomQuestionsFiltered(g, subject, unit).length);
+  }, [gradeBand, subGrade, subject, unit, isNational, band.grades]);
 
   const handleStepChange = (newStep: Step) => {
     playButtonClick();
@@ -93,7 +99,9 @@ export default function GameSetupPage() {
     .map((s) => s.trim())
     .filter((s) => s.length > 0);
 
-  const units = CURRICULUM_UNITS[String(grade)]?.[subject] ?? [];
+  const units = isNational
+    ? (CURRICULUM_UNITS[String(subGrade)]?.[subject] ?? [])
+    : band.grades.flatMap((g) => CURRICULUM_UNITS[String(g)]?.[subject] ?? []);
 
   const handleStart = async () => {
     if (students.length < 4 || !unit) return;
@@ -102,16 +110,17 @@ export default function GameSetupPage() {
     const [teamAStudents, teamBStudents] = splitIntoTeams(students);
 
     const { questionsSeed } = await import('@/data/questions-seed');
-    // 1순위: 선택한 단원 문제
+    const gradesInBand = isNational ? [subGrade] : [...band.grades];
+    // 1순위: 선택한 단원 문제 (학년군 범위)
     const unitQuestions = questionsSeed.filter(
-      (q) => q.grade === grade && q.subject === subject && q.unit === unit
+      (q) => gradesInBand.includes(q.grade) && q.subject === subject && q.unit === unit
     );
-    // 2순위: 같은 학년+과목의 다른 단원 문제 (풀이 적을 때 보충)
+    // 2순위: 같은 학년군+과목의 다른 단원 문제 (풀이 적을 때 보충)
     const MIN_POOL = 50;
     let filtered = unitQuestions;
     if (unitQuestions.length < MIN_POOL) {
       const sameSubject = questionsSeed.filter(
-        (q) => q.grade === grade && q.subject === subject && q.unit !== unit
+        (q) => gradesInBand.includes(q.grade) && q.subject === subject && q.unit !== unit
       );
       const extra = sameSubject.sort(() => Math.random() - 0.5).slice(0, MIN_POOL - unitQuestions.length);
       filtered = [...unitQuestions, ...extra];
@@ -132,8 +141,9 @@ export default function GameSetupPage() {
       created_at: new Date().toISOString(),
     }));
 
-    // 내 문제(커스텀) 병합 - 같은 학년/과목/단원만
-    const customRuntime = getCustomQuestionsFiltered(grade, subject, unit).map((c) => ({
+    // 내 문제(커스텀) 병합
+    const filterGrade = isNational ? subGrade : band.grades[0];
+    const customRuntime = getCustomQuestionsFiltered(filterGrade, subject, unit).map((c) => ({
       ...toRuntimeQuestion(c),
     }));
 
@@ -288,24 +298,24 @@ export default function GameSetupPage() {
                 exit={{ x: -50, opacity: 0 }}
                 className="flex flex-col gap-6"
               >
-                <h2 className="text-3xl font-black text-white">학년 / 과목 / 단원</h2>
+                <h2 className="text-3xl font-black text-white">학년군 / 과목 / 단원</h2>
 
                 <div>
-                  <label className="text-lg text-gray-400 block mb-3 font-medium">학년</label>
+                  <label className="text-lg text-gray-400 block mb-3 font-medium">학년군</label>
                   <div className="flex gap-3">
-                    {GRADES.map((g) => (
+                    {GRADE_BANDS.map((b) => (
                       <motion.button
-                        key={g}
-                        onClick={() => { playButtonClick(); setGrade(g); setUnit(''); }}
+                        key={b.key}
+                        onClick={() => { playButtonClick(); setGradeBand(b.key as GradeBandKey); setSubGrade(b.grades[0]); setUnit(''); }}
                         className={`flex-1 py-5 rounded-2xl font-black text-2xl transition-all ${
-                          grade === g
+                          gradeBand === b.key
                             ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white glow-purple'
                             : 'glass text-gray-400 hover:bg-white/5'
                         }`}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        {g}학년
+                        {b.label}
                       </motion.button>
                     ))}
                   </div>
@@ -331,6 +341,31 @@ export default function GameSetupPage() {
                     ))}
                   </div>
                 </div>
+
+                {isNational && (
+                  <div>
+                    <label className="text-lg text-gray-400 block mb-3 font-medium">
+                      학년 선택 <span className="text-xs text-yellow-400/70 ml-2">({subject} — 국정교과서)</span>
+                    </label>
+                    <div className="flex gap-3">
+                      {band.grades.map((g) => (
+                        <motion.button
+                          key={g}
+                          onClick={() => { playButtonClick(); setSubGrade(g); setUnit(''); }}
+                          className={`flex-1 py-4 rounded-2xl font-black text-xl transition-all ${
+                            subGrade === g
+                              ? 'bg-gradient-to-r from-yellow-600 to-amber-600 text-white glow-amber'
+                              : 'glass text-gray-400 hover:bg-white/5'
+                          }`}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          {g}학년
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <div className="flex items-baseline justify-between mb-3">
@@ -475,8 +510,8 @@ export default function GameSetupPage() {
                   <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-xl">
                     <span className="text-gray-500">학생 수</span>
                     <span className="text-white font-bold">{students.length}명</span>
-                    <span className="text-gray-500">학년/과목</span>
-                    <span className="text-white font-bold">{grade}학년 {subject}</span>
+                    <span className="text-gray-500">학년군/과목</span>
+                    <span className="text-white font-bold">{band.label} {subject}{isNational ? ` (${subGrade}학년)` : ''}</span>
                     <span className="text-gray-500">단원</span>
                     <span className="text-white font-bold text-base leading-relaxed">{unit}</span>
                     <span className="text-gray-500">목표 점수</span>

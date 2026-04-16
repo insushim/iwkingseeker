@@ -27,6 +27,9 @@ import { seedGrade5V2Math } from './seed-grade5-v2-math';
 import { seedGrade5V2Science } from './seed-grade5-v2-science';
 import { seedGrade5V2English } from './seed-grade5-v2-english';
 import { seedGrade5V2Others } from './seed-grade5-v2-others';
+import { seedGrade5V3Korean } from './seed-grade5-v3-korean';
+import { seedGrade5V3Social } from './seed-grade5-v3-social';
+import { seedGrade5V3Science } from './seed-grade5-v3-science';
 
 export interface QuestionSeed {
   grade: number;
@@ -390,6 +393,7 @@ export const questionsSeed: QuestionSeed[] = [
   ...seed2022Grade5EnglishHard2, ...seed2022Grade5OtherHard2,
   ...seed2022Grade5Korean1sU12, ...seed2022Grade5Korean1sU34, ...seed2022Grade5Korean1sU56,
   ...seedGrade5V2Math, ...seedGrade5V2Science, ...seedGrade5V2English, ...seedGrade5V2Others,
+  ...seedGrade5V3Korean, ...seedGrade5V3Social, ...seedGrade5V3Science,
 ].filter((q) => {
   const key = `${q.grade}-${q.subject}-${q.question_text}`;
   if (seen.has(key)) return false;
