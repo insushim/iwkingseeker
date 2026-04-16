@@ -22,6 +22,11 @@ import { seed2022Grade5OtherHard2 } from './seed-2022-grade5-other-hard2';
 import { seed2022Grade5Korean1sU12 } from './seed-2022-grade5-korean-1s-u12';
 import { seed2022Grade5Korean1sU34 } from './seed-2022-grade5-korean-1s-u34';
 import { seed2022Grade5Korean1sU56 } from './seed-2022-grade5-korean-1s-u56';
+// v2 확장 — 5학년 콘텐츠 2배 증량
+import { seedGrade5V2Math } from './seed-grade5-v2-math';
+import { seedGrade5V2Science } from './seed-grade5-v2-science';
+import { seedGrade5V2English } from './seed-grade5-v2-english';
+import { seedGrade5V2Others } from './seed-grade5-v2-others';
 
 export interface QuestionSeed {
   grade: number;
@@ -384,6 +389,7 @@ export const questionsSeed: QuestionSeed[] = [
   ...seed2022Grade5MathHard2,
   ...seed2022Grade5EnglishHard2, ...seed2022Grade5OtherHard2,
   ...seed2022Grade5Korean1sU12, ...seed2022Grade5Korean1sU34, ...seed2022Grade5Korean1sU56,
+  ...seedGrade5V2Math, ...seedGrade5V2Science, ...seedGrade5V2English, ...seedGrade5V2Others,
 ].filter((q) => {
   const key = `${q.grade}-${q.subject}-${q.question_text}`;
   if (seen.has(key)) return false;
