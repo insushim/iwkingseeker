@@ -5,8 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import Timer from './Timer';
 import { playCorrectSound, playWrongSound } from '@/lib/sounds';
+import { speak, stopSpeaking, warmUpVoices } from '@/lib/tts';
 import { cn } from '@/lib/utils';
-import { Sparkles, Zap, HelpCircle } from 'lucide-react';
+import { Sparkles, Zap, HelpCircle, Volume2 } from 'lucide-react';
 import WhackAMole from './quiz-modes/WhackAMole';
 import MatchingPairs from './quiz-modes/MatchingPairs';
 import SmartText from './SmartText';
@@ -101,7 +102,7 @@ function ResultOverlay({ isCorrect }: { isCorrect: boolean }) {
 }
 
 export default function QuizDisplay() {
-  const { currentQuestion, currentAttacker, teamA, teamB, timerSeconds, submitAnswer, totalQuestionsAsked } = useGameStore();
+  const { currentQuestion, currentAttacker, teamA, teamB, timerSeconds, submitAnswer, totalQuestionsAsked, setQuizResult } = useGameStore();
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -137,6 +138,23 @@ export default function QuizDisplay() {
     return () => window.removeEventListener('display-answer', handler);
   });
 
+  // TTS: 새 문제가 뜨면 자동으로 읽어줌
+  useEffect(() => {
+    warmUpVoices();
+  }, []);
+  useEffect(() => {
+    if (currentQuestion?.question_text && !showResult) {
+      // 살짝 딜레이 (페이즈 전환 사운드와 겹치지 않게)
+      const t = setTimeout(() => {
+        speak(currentQuestion.question_text);
+      }, 350);
+      return () => {
+        clearTimeout(t);
+        stopSpeaking();
+      };
+    }
+  }, [currentQuestion?.id, currentQuestion?.question_text, showResult]);
+
   const handleAnswer = useCallback(
     (answer: string) => {
       if (showResult || !currentQuestion) return;
@@ -145,29 +163,30 @@ export default function QuizDisplay() {
       setIsCorrect(correct);
       setShowResult(true);
       setShowHint(false);
-
-      // 해설 유무에 따라 표시 시간 조정
-      const hasExplanation = Boolean(currentQuestion.explanation);
-      const correctDelay = hasExplanation ? 4500 : 2000;
-      const wrongDelay = hasExplanation ? 4500 : 2500;
+      // 학생 화면에도 결과 공개
+      setQuizResult({ selectedAnswer: answer, isCorrect: correct });
+      // TTS 읽기 중이면 중단
+      stopSpeaking();
 
       if (correct) {
         playCorrectSound();
         setTimeout(() => {
           setSelectedAnswer(null);
           setShowResult(false);
+          setQuizResult(null);
           submitAnswer(answer, true);
-        }, correctDelay);
+        }, 2000);
       } else {
         playWrongSound();
         setTimeout(() => {
           setShowResult(false);
           setSelectedAnswer(null);
+          setQuizResult(null);
           submitAnswer(answer, false);
-        }, wrongDelay);
+        }, 2000);
       }
     },
-    [showResult, currentQuestion, submitAnswer]
+    [showResult, currentQuestion, submitAnswer, setQuizResult]
   );
 
   const handleTimeUp = useCallback(() => {
@@ -214,6 +233,19 @@ export default function QuizDisplay() {
           <span className="text-xs text-purple-400/60 glass px-2 py-1 rounded-lg">
             {styleLabel}
           </span>
+          {/* 문제 다시 읽어주기 */}
+          {!showResult && (
+            <motion.button
+              onClick={() => speak(q.question_text)}
+              className="flex items-center gap-1 px-3 py-1.5 glass text-sky-400/80 hover:text-sky-300 rounded-lg text-sm transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="문제 읽어주기"
+            >
+              <Volume2 className="w-4 h-4" />
+              읽기
+            </motion.button>
+          )}
           {/* 초성 힌트 버튼 */}
           {!isOX && !showHint && !showResult && (
             <motion.button

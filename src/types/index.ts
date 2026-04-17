@@ -118,6 +118,10 @@ export interface GameState {
   lastGuessResult: 'found' | 'not_found' | null;
   lastGuessedStudent: string | null;
   questionPool: Question[];
+  quizResult: {
+    selectedAnswer: string;
+    isCorrect: boolean;
+  } | null;
 }
 
 export interface CustomQuestion {

@@ -27,6 +27,7 @@ interface GameActions {
   endGame: () => void;
   resetGame: () => void;
   setQuestionPool: (pool: Question[]) => void;
+  setQuizResult: (result: { selectedAnswer: string; isCorrect: boolean } | null) => void;
   addUsedQuestionId: (id: string) => void;
 }
 
@@ -55,6 +56,7 @@ const initialState: GameState = {
   lastGuessResult: null,
   lastGuessedStudent: null,
   questionPool: [],
+  quizResult: null,
 };
 
 export const useGameStore = create<GameState & GameActions>((set, get) => ({
@@ -269,6 +271,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
   resetGame: () => set({ ...initialState }),
 
   setQuestionPool: (pool) => set({ questionPool: pool }),
+  setQuizResult: (result) => set({ quizResult: result }),
 
   addUsedQuestionId: (id) =>
     set((state) => ({

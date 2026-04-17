@@ -30,6 +30,13 @@ export interface DisplayState {
   revealedB: string[];
   kingSelectorA: string | null;
   kingSelectorB: string | null;
+  /** 결과 공개 순간만 correct_answer/explanation이 함께 동봉됨 */
+  quizResult: {
+    selectedAnswer: string;
+    isCorrect: boolean;
+    correctAnswer: string;
+    explanation: string | null;
+  } | null;
 }
 
 export interface DisplayMessage {
@@ -76,5 +83,13 @@ export function sanitizeForDisplay(s: GameState): DisplayState {
     revealedB: s.revealedB,
     kingSelectorA: s.kingSelectorA,
     kingSelectorB: s.kingSelectorB,
+    quizResult: s.quizResult && s.currentQuestion
+      ? {
+          selectedAnswer: s.quizResult.selectedAnswer,
+          isCorrect: s.quizResult.isCorrect,
+          correctAnswer: s.currentQuestion.correct_answer,
+          explanation: s.currentQuestion.explanation,
+        }
+      : null,
   };
 }

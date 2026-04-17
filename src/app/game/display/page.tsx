@@ -660,8 +660,74 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
         </div>
       )}
 
-      {/* No teacher hint on display page */}
+      {/* 결과/해설 오버레이 — 교사 화면 state 기반 */}
+      {state.quizResult && (
+        <DisplayQuizResult
+          isCorrect={state.quizResult.isCorrect}
+          selectedAnswer={state.quizResult.selectedAnswer}
+          correctAnswer={state.quizResult.correctAnswer}
+          explanation={state.quizResult.explanation}
+        />
+      )}
     </div>
+  );
+}
+
+function DisplayQuizResult({
+  isCorrect,
+  correctAnswer,
+  explanation,
+}: {
+  isCorrect: boolean;
+  selectedAnswer: string;
+  correctAnswer: string;
+  explanation: string | null;
+}) {
+  return (
+    <>
+      {/* Full-screen overlay */}
+      <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
+        <div
+          className="absolute inset-0"
+          style={{ background: isCorrect ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)' }}
+        />
+        <div
+          className={cn(
+            'relative text-8xl font-black px-16 py-10 rounded-3xl',
+            isCorrect
+              ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white glow-green'
+              : 'bg-gradient-to-br from-red-500 to-rose-600 text-white glow-red'
+          )}
+          style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+        >
+          {isCorrect ? '정답!' : '오답!'}
+        </div>
+      </div>
+      {/* Bottom explanation card */}
+      <div
+        className={cn(
+          'absolute left-4 right-4 bottom-4 rounded-xl p-4 border z-50',
+          isCorrect ? 'bg-green-950/80 border-green-500/40' : 'bg-red-950/80 border-red-500/40'
+        )}
+        style={{ boxShadow: isCorrect ? '0 0 20px rgba(34,197,94,0.2)' : '0 0 20px rgba(239,68,68,0.2)' }}
+      >
+        {!isCorrect && (
+          <p className="text-base mb-2 flex items-center gap-2 flex-wrap">
+            <span className="text-red-300 font-bold">오답!</span>
+            <span className="text-gray-300">정답은</span>
+            <span className="px-2 py-0.5 bg-green-600/80 rounded-md text-white font-bold">
+              <SmartText text={correctAnswer} />
+            </span>
+            <span className="text-gray-300">입니다.</span>
+          </p>
+        )}
+        {explanation && (
+          <p className="text-sm text-gray-100 leading-relaxed">
+            ✨ <SmartText text={explanation} />
+          </p>
+        )}
+      </div>
+    </>
   );
 }
 
