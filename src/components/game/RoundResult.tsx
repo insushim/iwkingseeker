@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import CrownAnimation from './CrownAnimation';
 import { playKingFoundSound, playWrongSound } from '@/lib/sounds';
-import { ShieldX, ArrowRight } from 'lucide-react';
+import { pickQuestion } from '@/lib/questionPicker';
+import { ShieldX, ArrowRight, ArrowRightLeft } from 'lucide-react';
 
 export default function RoundResult() {
   const {
@@ -13,8 +14,18 @@ export default function RoundResult() {
     lastGuessedStudent,
     startNewRound,
     setPhase,
+    setCurrentQuestion,
+    questionPool,
+    usedQuestionIds,
+    currentAttacker,
+    teamA,
+    teamB,
     phase,
   } = useGameStore();
+
+  const nextAttackerName = currentAttacker === 'team_a' ? teamA.name : teamB.name;
+  const nextAttackerEmoji = currentAttacker === 'team_a' ? '🐲' : '🐯';
+  const nextAttackerColor = currentAttacker === 'team_a' ? 'text-blue-400' : 'text-amber-400';
 
   useEffect(() => {
     if (lastGuessResult === 'found') {
@@ -23,6 +34,20 @@ export default function RoundResult() {
       playWrongSound();
     }
   }, [lastGuessResult]);
+
+  const handleNext = () => {
+    const next = pickQuestion(questionPool, usedQuestionIds);
+    if (next) setCurrentQuestion(next);
+    setPhase('QUIZ');
+  };
+
+  // 왕 지목 오답 시 4초 후 자동 진행 (안전망)
+  useEffect(() => {
+    if (lastGuessResult === 'not_found' && phase === 'ROUND_RESULT') {
+      const timer = setTimeout(() => handleNext(), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [lastGuessResult, phase]);
 
   if (lastGuessResult === 'found' && phase !== 'GAME_OVER') {
     return (
@@ -78,10 +103,24 @@ export default function RoundResult() {
         </p>
       </motion.div>
 
+      {/* 공수 교대 안내 */}
+      <motion.div
+        className="flex items-center gap-3 glass-strong rounded-2xl px-6 py-3"
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.4 }}
+      >
+        <ArrowRightLeft className="w-6 h-6 text-purple-400" />
+        <span className="text-gray-400">공격권이</span>
+        <span className="text-3xl">{nextAttackerEmoji}</span>
+        <span className={`text-2xl font-black ${nextAttackerColor}`}>{nextAttackerName}</span>
+        <span className="text-gray-400">에게!</span>
+      </motion.div>
+
       <motion.button
         className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-2xl font-black text-lg transition-shadow hover:shadow-lg hover:shadow-purple-500/20"
         style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
-        onClick={() => setPhase('QUIZ')}
+        onClick={handleNext}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         initial={{ y: 20, opacity: 0 }}
@@ -91,6 +130,15 @@ export default function RoundResult() {
         다음 문제로
         <ArrowRight className="w-5 h-5" />
       </motion.button>
+
+      <motion.p
+        className="text-xs text-gray-500"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7 }}
+      >
+        (4초 후 자동 진행)
+      </motion.p>
     </motion.div>
   );
 }
