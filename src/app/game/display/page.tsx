@@ -849,40 +849,50 @@ function DisplayKingGuess({ state, channelRef }: {
   );
 }
 
-function DisplayRoundResult({ state }: { state: DisplayState }) {
+function DisplayRoundResult({ state, channelRef }: {
+  state: DisplayState;
+  channelRef: React.RefObject<BroadcastChannel | null>;
+}) {
   if (state.lastGuessResult === 'found') {
+    const handleContinue = () => {
+      channelRef.current?.postMessage({ type: 'action', action: 'next-round' });
+    };
     return (
       <div className="flex flex-col items-center gap-6">
         <motion.div
           className="relative"
-          initial={{ scale: 0, rotate: -180, y: -50 }}
-          animate={{ scale: 1, rotate: 0, y: 0 }}
+          animate={{ scale: [0.8, 1], rotate: [-30, 0], y: [-20, 0] }}
           transition={{ type: 'spring', stiffness: 180, damping: 12 }}
         >
           <span className="text-[120px] block" style={{ filter: 'drop-shadow(0 0 40px rgba(250,204,21,0.5))' }}>
             👑
           </span>
         </motion.div>
-        <motion.h2
+        <h2
           className="text-5xl font-black text-gradient-gold"
           style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
         >
           왕을 찾았다!
-        </motion.h2>
-        <motion.div
+        </h2>
+        <div
           className="glass-strong rounded-2xl px-8 py-4"
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.7 }}
           style={{ boxShadow: '0 0 30px rgba(250,204,21,0.15)' }}
         >
           <p className="text-2xl text-white font-bold text-center">
             <span className="text-yellow-400">{state.lastGuessedStudent}</span> 학생이 왕이었습니다!
           </p>
-        </motion.div>
+        </div>
+        <motion.button
+          onClick={handleContinue}
+          className="mt-2 px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-2xl font-black text-2xl cursor-pointer transition-shadow hover:shadow-lg hover:shadow-purple-500/30"
+          style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          animate={{ boxShadow: ['0 0 0px rgba(168,85,247,0)', '0 0 25px rgba(168,85,247,0.5)', '0 0 0px rgba(168,85,247,0)'] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          계속하기 →
+        </motion.button>
       </div>
     );
   }
@@ -1143,7 +1153,7 @@ export default function DisplayPage() {
       case 'GUESS_KING':
         return <DisplayKingGuess state={gameState} channelRef={channelRef} />;
       case 'ROUND_RESULT':
-        return <DisplayRoundResult state={gameState} />;
+        return <DisplayRoundResult state={gameState} channelRef={channelRef} />;
       case 'NEW_ROUND':
         return <SetupWaiting />;
       case 'GAME_OVER':

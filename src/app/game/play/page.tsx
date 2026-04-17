@@ -89,6 +89,13 @@ export default function GamePlayPage() {
           current.guessKing(e.data.value);
         }
       }
+      // 학생 화면에서 "계속하기" 눌러 다음 라운드로
+      if (e.data?.type === 'action' && e.data?.action === 'next-round') {
+        const current = useGameStore.getState();
+        if (current.phase === 'ROUND_RESULT') {
+          current.startNewRound();
+        }
+      }
     };
 
     // Send initial state immediately (in case display is already open)
