@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import StudentCard from './StudentCard';
 import { playButtonClick, playKingSelectSuspense } from '@/lib/sounds';
@@ -165,39 +165,25 @@ export default function KingGuess() {
         })}
       </div>
 
-      {/* 두근두근 서스펜스 오버레이 */}
-      <AnimatePresence>
-        {isSuspense && (
-          <motion.div
-            className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-red-950/40 border border-red-500/40"
-            style={{ boxShadow: '0 0 30px rgba(239,68,68,0.3)' }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
+      {/* 두근두근 서스펜스 오버레이 — CSS 애니메이션으로 백그라운드 탭에서도 표시 */}
+      {isSuspense && (
+        <div
+          className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-red-950/40 border border-red-500/40 suspense-fadein"
+          style={{ boxShadow: '0 0 30px rgba(239,68,68,0.3)' }}
+        >
+          <Heart className="w-7 h-7 text-red-400 fill-red-400 heartbeat-pulse" />
+          <span
+            className="text-2xl font-black text-red-200 heartbeat-text"
+            style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
           >
-            <motion.div
-              animate={{ scale: [1, 1.3, 1, 1.3, 1] }}
-              transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <Heart className="w-7 h-7 text-red-400 fill-red-400" />
-            </motion.div>
-            <motion.span
-              className="text-2xl font-black text-red-200"
-              style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
-              animate={{ opacity: [1, 0.6, 1, 0.6, 1] }}
-              transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              두근... 두근...
-            </motion.span>
-            <motion.div
-              animate={{ scale: [1, 1.3, 1, 1.3, 1] }}
-              transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut', delay: 0.1 }}
-            >
-              <Heart className="w-7 h-7 text-red-400 fill-red-400" />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            두근... 두근...
+          </span>
+          <Heart
+            className="w-7 h-7 text-red-400 fill-red-400 heartbeat-pulse"
+            style={{ animationDelay: '0.1s' }}
+          />
+        </div>
+      )}
 
       {/* Confirm button */}
       <motion.button

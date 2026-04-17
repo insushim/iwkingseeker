@@ -146,21 +146,25 @@ export default function QuizDisplay() {
       setShowResult(true);
       setShowHint(false);
 
+      // 해설 유무에 따라 표시 시간 조정
+      const hasExplanation = Boolean(currentQuestion.explanation);
+      const correctDelay = hasExplanation ? 4500 : 2000;
+      const wrongDelay = hasExplanation ? 4500 : 2500;
+
       if (correct) {
         playCorrectSound();
         setTimeout(() => {
           setSelectedAnswer(null);
           setShowResult(false);
           submitAnswer(answer, true);
-        }, 2000);
+        }, correctDelay);
       } else {
         playWrongSound();
-        // 오답: 1.5초 오답 표시 → WRONG_ANSWER phase로 직접 이동 (공수교대 1회만)
         setTimeout(() => {
           setShowResult(false);
           setSelectedAnswer(null);
           submitAnswer(answer, false);
-        }, 1500);
+        }, wrongDelay);
       }
     },
     [showResult, currentQuestion, submitAnswer]
@@ -435,14 +439,34 @@ export default function QuizDisplay() {
       {/* Result overlay */}
       <AnimatePresence>{showResult && <ResultOverlay isCorrect={isCorrect} />}</AnimatePresence>
 
-      {/* Explanation */}
-      {showResult && isCorrect && q.explanation && (
-        <motion.div className="w-full glass rounded-xl p-4" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-          <p className="text-sm text-gray-300 flex items-start gap-2">
-            <Sparkles className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
-            {q.explanation}
-          </p>
-        </motion.div>
+      {/* Explanation — 정답/오답 모두 표시 */}
+      {showResult && (q.explanation || !isCorrect) && (
+        <div
+          className={cn(
+            'w-full rounded-xl p-4 border',
+            isCorrect
+              ? 'bg-green-950/40 border-green-500/30'
+              : 'bg-red-950/40 border-red-500/30'
+          )}
+          style={{ boxShadow: isCorrect ? '0 0 20px rgba(34,197,94,0.15)' : '0 0 20px rgba(239,68,68,0.15)' }}
+        >
+          {!isCorrect && (
+            <p className="text-base mb-2 flex items-center gap-2">
+              <span className="text-red-300 font-bold">오답!</span>
+              <span className="text-gray-400">정답은</span>
+              <span className="px-2 py-0.5 bg-green-600/80 rounded-md text-white font-bold">
+                <SmartText text={q.correct_answer} />
+              </span>
+              <span className="text-gray-400">입니다.</span>
+            </p>
+          )}
+          {q.explanation && (
+            <p className="text-sm text-gray-200 flex items-start gap-2 leading-relaxed">
+              <Sparkles className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
+              <SmartText text={q.explanation} />
+            </p>
+          )}
+        </div>
       )}
 
       {/* Teacher hint */}
