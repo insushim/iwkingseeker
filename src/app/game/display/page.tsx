@@ -8,9 +8,10 @@ import { cn } from '@/lib/utils';
 import { DISPLAY_CHANNEL } from '@/lib/displayChannel';
 import type { DisplayState } from '@/lib/displayChannel';
 import WhackAMole from '@/components/game/quiz-modes/WhackAMole';
-import SpinWheel from '@/components/game/quiz-modes/SpinWheel';
 import MatchingPairs from '@/components/game/quiz-modes/MatchingPairs';
 import StudentCard from '@/components/game/StudentCard';
+import TeamEmoji from '@/components/game/TeamEmoji';
+import SmartText from '@/components/game/SmartText';
 
 /* ──────────────────────────────────────
    Scoreboard (props-driven, no Zustand)
@@ -37,7 +38,7 @@ function DisplayScoreBoard({ teamA, teamB, currentAttacker, targetScore }: {
       />
 
       <DisplayTeamScore
-        name={teamA.name} score={teamA.score} emoji="🐲"
+        name={teamA.name} score={teamA.score} team="team_a"
         isActive={currentAttacker === 'team_a'}
         colorClass="text-blue-400" glowClass="glow-blue" glassBg="glass-blue"
         targetScore={targetScore}
@@ -55,7 +56,7 @@ function DisplayScoreBoard({ teamA, teamB, currentAttacker, targetScore }: {
       </div>
 
       <DisplayTeamScore
-        name={teamB.name} score={teamB.score} emoji="🐯"
+        name={teamB.name} score={teamB.score} team="team_b"
         isActive={currentAttacker === 'team_b'}
         colorClass="text-amber-400" glowClass="glow-amber" glassBg="glass-amber"
         targetScore={targetScore}
@@ -64,8 +65,8 @@ function DisplayScoreBoard({ teamA, teamB, currentAttacker, targetScore }: {
   );
 }
 
-function DisplayTeamScore({ name, score, emoji, isActive, colorClass, glowClass, glassBg, targetScore }: {
-  name: string; score: number; emoji: string; isActive: boolean;
+function DisplayTeamScore({ name, score, team, isActive, colorClass, glowClass, glassBg, targetScore }: {
+  name: string; score: number; team: 'team_a' | 'team_b'; isActive: boolean;
   colorClass: string; glowClass: string; glassBg: string; targetScore: number;
 }) {
   return (
@@ -84,13 +85,13 @@ function DisplayTeamScore({ name, score, emoji, isActive, colorClass, glowClass,
           style={{ background: 'transparent' }}
         />
       )}
-      <motion.span
-        className="text-4xl relative z-10"
+      <motion.div
+        className="relative z-10 flex items-center justify-center"
         animate={isActive ? { scale: [1, 1.1, 1] } : {}}
         transition={{ repeat: isActive ? Infinity : 0, duration: 1.5 }}
       >
-        {emoji}
-      </motion.span>
+        <TeamEmoji team={team} size={40} />
+      </motion.div>
       <div className="flex flex-col relative z-10">
         <span className={cn('text-xl font-bold', colorClass)}>{name}</span>
         <div className="flex items-center gap-1 mt-0.5">
@@ -227,7 +228,7 @@ const STYLE_COLORS = [
 
 const STYLE_EMOJIS = ['🔴', '🔵', '🟢', '🟡'];
 
-type QuizStyle = 'grid' | 'list' | 'bigcard' | 'speed' | 'whack' | 'wheel' | 'cards';
+type QuizStyle = 'grid' | 'list' | 'bigcard' | 'speed' | 'whack' | 'cards';
 
 /* ──────────────────────────────────────
    Phase-specific display sections
@@ -378,13 +379,12 @@ function DisplayRPS({ teamAName, teamBName, channelRef }: {
           transition={{ delay: 0.3 }}
           disabled={selecting}
         >
-          <motion.span
-            className="text-7xl"
+          <motion.div
             animate={{ rotate: [0, -5, 5, 0] }}
             transition={{ repeat: Infinity, duration: 3 }}
           >
-            🐲
-          </motion.span>
+            <TeamEmoji team="team_a" size={110} />
+          </motion.div>
           <span
             className="text-3xl font-black text-blue-400"
             style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
@@ -416,13 +416,12 @@ function DisplayRPS({ teamAName, teamBName, channelRef }: {
           transition={{ delay: 0.3 }}
           disabled={selecting}
         >
-          <motion.span
-            className="text-7xl"
+          <motion.div
             animate={{ rotate: [0, 5, -5, 0] }}
             transition={{ repeat: Infinity, duration: 3 }}
           >
-            🐯
-          </motion.span>
+            <TeamEmoji team="team_b" size={110} />
+          </motion.div>
           <span
             className="text-3xl font-black text-amber-400"
             style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
@@ -450,14 +449,13 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
   };
 
   const attackerName = state.currentAttacker === 'team_a' ? state.teamA.name : state.teamB.name;
-  const attackerEmoji = state.currentAttacker === 'team_a' ? '🐲' : '🐯';
   const isOX = q.question_type === 'ox';
   const options = q.options ?? [];
 
   const quizStyle: QuizStyle = (() => {
     const isFourChoice = q.question_type === 'multiple_choice' && (q.options?.length ?? 0) === 4;
     const styles: QuizStyle[] = isFourChoice
-      ? ['grid', 'whack', 'list', 'wheel', 'bigcard', 'cards', 'speed']
+      ? ['grid', 'whack', 'list', 'bigcard', 'cards', 'speed']
       : ['grid', 'list', 'bigcard', 'speed'];
     return styles[state.totalQuestionsAsked % styles.length]!;
   })();
@@ -473,8 +471,6 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
     ? '스피드'
     : quizStyle === 'whack'
     ? '🔨 두더지'
-    : quizStyle === 'wheel'
-    ? '🎯 룰렛'
     : '🃏 뒤집기';
 
   return (
@@ -489,7 +485,7 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
           animate={{ scale: [1, 1.03, 1] }}
           transition={{ repeat: Infinity, duration: 2 }}
         >
-          <span className="text-2xl">{attackerEmoji}</span>
+          <TeamEmoji team={state.currentAttacker} size={28} />
           <span>공격: {attackerName}</span>
         </motion.div>
         <div className="flex items-center gap-3">
@@ -512,7 +508,7 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
               {q.subject} &middot; {q.unit}
             </p>
             <h3 className="text-4xl md:text-5xl font-bold text-white leading-relaxed">
-              {q.question_text}
+              <SmartText text={q.question_text} />
             </h3>
           </div>
           {quizStyle === 'speed' && !isOX && (
@@ -567,7 +563,7 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
                 whileTap={{ scale: 0.98 }}
               >
                 <span className="mr-4 text-4xl font-black opacity-40">{style.label}</span>
-                {option}
+                <SmartText text={option} />
               </motion.button>
             );
           })}
@@ -591,22 +587,13 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
                 whileTap={{ scale: 0.98 }}
               >
                 <span className="text-4xl">{STYLE_EMOJIS[i]}</span>
-                <span className="flex-1">{option}</span>
+                <span className="flex-1"><SmartText text={option} /></span>
               </motion.button>
             );
           })}
         </div>
       ) : quizStyle === 'whack' ? (
         <WhackAMole
-          options={options}
-          correctAnswer=""
-          selectedAnswer={null}
-          showResult={false}
-          isCorrect={false}
-          onAnswer={sendAnswer}
-        />
-      ) : quizStyle === 'wheel' ? (
-        <SpinWheel
           options={options}
           correctAnswer=""
           selectedAnswer={null}
@@ -642,7 +629,7 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
                 whileTap={{ scale: 0.97 }}
               >
                 <span className="text-5xl mb-2 opacity-30">{style.label}</span>
-                <span className="px-4 leading-snug">{option}</span>
+                <span className="px-4 leading-snug"><SmartText text={option} /></span>
               </motion.button>
             );
           })}
@@ -666,7 +653,7 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
                 whileTap={{ scale: 0.98 }}
               >
                 <span className="text-4xl font-black opacity-50 shrink-0 w-12 text-center">{i + 1}</span>
-                <span className="flex-1">{option}</span>
+                <span className="flex-1"><SmartText text={option} /></span>
               </motion.button>
             );
           })}
@@ -680,7 +667,6 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
 
 function DisplayWrongAnswer({ state }: { state: DisplayState }) {
   const attackerName = state.currentAttacker === 'team_a' ? state.teamA.name : state.teamB.name;
-  const attackerEmoji = state.currentAttacker === 'team_a' ? '🐲' : '🐯';
   const attackerColor = state.currentAttacker === 'team_a' ? 'text-blue-400' : 'text-amber-400';
 
   return (
@@ -709,7 +695,7 @@ function DisplayWrongAnswer({ state }: { state: DisplayState }) {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <span className="text-5xl">{attackerEmoji}</span>
+        <TeamEmoji team={state.currentAttacker} size={56} />
         <div>
           <p className="text-gray-400 text-lg">다음 공격</p>
           <p className={`text-3xl font-black ${attackerColor}`}>{attackerName}</p>
@@ -925,9 +911,8 @@ function DisplayRoundResult({ state }: { state: DisplayState }) {
 }
 
 function DisplayGameOver({ state }: { state: DisplayState }) {
-  const winner = state.teamA.score >= state.targetScore ? 'team_a' : 'team_b';
+  const winner: 'team_a' | 'team_b' = state.teamA.score >= state.targetScore ? 'team_a' : 'team_b';
   const winnerData = winner === 'team_a' ? state.teamA : state.teamB;
-  const winnerEmoji = winner === 'team_a' ? '🐲' : '🐯';
   const winnerGradient = winner === 'team_a' ? 'from-blue-400 to-cyan-400' : 'from-amber-400 to-yellow-400';
   const winnerGlow = winner === 'team_a' ? 'glow-blue' : 'glow-amber';
 
@@ -999,13 +984,13 @@ function DisplayGameOver({ state }: { state: DisplayState }) {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.6 }}
       >
-        <motion.span
-          className="text-7xl block mb-4"
+        <motion.div
+          className="flex justify-center mb-4"
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          {winnerEmoji}
-        </motion.span>
+          <TeamEmoji team={winner} size={96} />
+        </motion.div>
         <h1
           className={`text-6xl md:text-7xl font-black bg-gradient-to-r ${winnerGradient} bg-clip-text text-transparent`}
           style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif", WebkitTextFillColor: 'transparent' }}
