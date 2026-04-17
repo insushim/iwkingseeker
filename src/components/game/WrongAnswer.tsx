@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import { ArrowRightLeft, ShieldX } from 'lucide-react';
@@ -8,6 +8,7 @@ import TeamEmoji from './TeamEmoji';
 
 export default function WrongAnswer() {
   const { currentAttacker, teamA, teamB, setPhase, lastGuessResult, lastGuessedStudent } = useGameStore();
+  const startTsRef = useRef(Date.now());
 
   const attackerName = currentAttacker === 'team_a' ? teamA.name : teamB.name;
   const attackerColor = currentAttacker === 'team_a' ? 'text-blue-400' : 'text-amber-400';
@@ -16,17 +17,33 @@ export default function WrongAnswer() {
   const autoDelay = isWrongKing ? 3500 : 2000;
 
   useEffect(() => {
+    startTsRef.current = Date.now();
     const timer = setTimeout(() => {
       setPhase('QUIZ');
     }, autoDelay);
-    return () => clearTimeout(timer);
+
+    // 백그라운드 탭에서 setTimeout throttle 대응:
+    // 탭이 다시 보이면 경과 시간 체크 후 즉시 advance
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        const elapsed = Date.now() - startTsRef.current;
+        if (elapsed >= autoDelay) {
+          setPhase('QUIZ');
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [setPhase, autoDelay]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-6">
       <motion.div
-        initial={{ scale: 0, rotate: -180 }}
-        animate={{ scale: 1, rotate: 0 }}
+        animate={{ scale: [0.8, 1], rotate: [-180, 0] }}
         transition={{ type: 'spring', stiffness: 200, damping: 15 }}
       >
         <div
@@ -41,56 +58,44 @@ export default function WrongAnswer() {
         </div>
       </motion.div>
 
-      <motion.h2
+      <h2
         className="text-5xl font-black text-white"
         style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
-        initial={{ y: 30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
       >
         {isWrongKing ? '왕이 아닙니다!' : '공수 교대!'}
-      </motion.h2>
+      </h2>
 
       {isWrongKing && lastGuessedStudent && (
-        <motion.div
-          className="glass rounded-xl px-6 py-3"
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.35 }}
-        >
+        <div className="glass rounded-xl px-6 py-3">
           <p className="text-xl text-gray-300">
             <span className="text-white font-bold">{lastGuessedStudent}</span>
             <span className="text-gray-400"> 학생은 왕이 아닙니다.</span>
           </p>
-        </motion.div>
+        </div>
       )}
 
-      <motion.div
-        className="flex items-center gap-4 glass-strong rounded-2xl px-8 py-4"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5 }}
-      >
+      <div className="flex items-center gap-4 glass-strong rounded-2xl px-8 py-4">
         <TeamEmoji team={currentAttacker} size={56} />
         <div>
           <p className="text-gray-400 text-lg">다음 공격</p>
           <p className={`text-3xl font-black ${attackerColor}`}>{attackerName}</p>
         </div>
-      </motion.div>
+      </div>
+
+      <button
+        onClick={() => setPhase('QUIZ')}
+        className="mt-2 px-6 py-2 glass rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+      >
+        다음 문제 →
+      </button>
 
       <motion.div
         className="flex gap-1 mt-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
+        animate={{ opacity: [0.3, 1, 0.3] }}
+        transition={{ duration: 1, repeat: Infinity }}
       >
         {[0, 1, 2].map((i) => (
-          <motion.div
-            key={i}
-            className="w-3 h-3 rounded-full bg-purple-500"
-            animate={{ opacity: [0.3, 1, 0.3] }}
-            transition={{ duration: 1, repeat: Infinity, delay: i * 0.3 }}
-          />
+          <div key={i} className="w-3 h-3 rounded-full bg-purple-500" />
         ))}
       </motion.div>
     </div>

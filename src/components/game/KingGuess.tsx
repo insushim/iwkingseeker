@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import StudentCard from './StudentCard';
@@ -20,6 +20,22 @@ export default function KingGuess() {
   } = useGameStore();
   const [selected, setSelected] = useState<string | null>(null);
   const [isSuspense, setIsSuspense] = useState(false);
+  const suspenseStartRef = useRef<number | null>(null);
+
+  // 백그라운드 탭 throttle 대응: visibility 복귀 시 진행 체크
+  useEffect(() => {
+    if (!isSuspense || !selected) return;
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && suspenseStartRef.current) {
+        const elapsed = Date.now() - suspenseStartRef.current;
+        if (elapsed >= 2400 && useGameStore.getState().phase === 'GUESS_KING') {
+          guessKing(selected);
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [isSuspense, selected, guessKing]);
 
   const targetTeam = currentAttacker === 'team_a' ? 'team_b' : 'team_a';
   const targetTeamData = targetTeam === 'team_a' ? teamA : teamB;
@@ -36,6 +52,7 @@ export default function KingGuess() {
 
   const handleConfirm = () => {
     if (!selected || isSuspense) return;
+    suspenseStartRef.current = Date.now();
     setIsSuspense(true);
     playKingSelectSuspense();
     setTimeout(() => playKingSelectSuspense(), 1100);

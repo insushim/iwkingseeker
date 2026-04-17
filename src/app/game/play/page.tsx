@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import { useFullscreen } from '@/hooks/useFullscreen';
 import { pickQuestion } from '@/lib/questionPicker';
@@ -181,27 +181,22 @@ export default function GamePlayPage() {
       </div>
 
       {/* Main content - fill all remaining space */}
+      {/* AnimatePresence 제거: 백그라운드 탭에서 opacity 0 상태 고착 방지 */}
       <div className="relative z-10 flex-1 flex px-3 pb-2 min-h-0">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={phase}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.25 }}
-            className="w-full h-full flex items-center justify-center"
-          >
-            {phase === 'TEAM_SPLIT' && <TeamSplitter />}
-            {phase === 'KING_SELECT_A' && <KingSelector selectingTeam="team_a" />}
-            {phase === 'KING_SELECT_B' && <KingSelector selectingTeam="team_b" />}
-            {phase === 'RPS' && <RockPaperScissors />}
-            {phase === 'QUIZ' && <QuizDisplay />}
-            {phase === 'WRONG_ANSWER' && <WrongAnswer />}
-            {phase === 'GUESS_KING' && <KingGuess />}
-            {phase === 'ROUND_RESULT' && <RoundResult />}
-            {phase === 'GAME_OVER' && <GameOver />}
-          </motion.div>
-        </AnimatePresence>
+        <div
+          key={phase}
+          className="w-full h-full flex items-center justify-center"
+        >
+          {phase === 'TEAM_SPLIT' && <TeamSplitter />}
+          {phase === 'KING_SELECT_A' && <KingSelector selectingTeam="team_a" />}
+          {phase === 'KING_SELECT_B' && <KingSelector selectingTeam="team_b" />}
+          {phase === 'RPS' && <RockPaperScissors />}
+          {phase === 'QUIZ' && <QuizDisplay />}
+          {phase === 'WRONG_ANSWER' && <WrongAnswer />}
+          {phase === 'GUESS_KING' && <KingGuess />}
+          {phase === 'ROUND_RESULT' && <RoundResult />}
+          {phase === 'GAME_OVER' && <GameOver />}
+        </div>
       </div>
     </div>
   );

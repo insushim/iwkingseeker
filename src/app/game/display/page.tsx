@@ -1183,20 +1183,14 @@ export default function DisplayPage() {
         </div>
       </div>
 
-      {/* Main content */}
+      {/* Main content — AnimatePresence 제거: 백그라운드 탭 opacity 고착 방지 */}
       <div className="relative z-10 flex-1 flex px-3 pb-2 min-h-0">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={phase ?? 'waiting'}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.25 }}
-            className="w-full h-full flex items-center justify-center"
-          >
-            {renderPhase()}
-          </motion.div>
-        </AnimatePresence>
+        <div
+          key={phase ?? 'waiting'}
+          className="w-full h-full flex items-center justify-center"
+        >
+          {renderPhase()}
+        </div>
       </div>
 
       {/* Display mode badge */}
