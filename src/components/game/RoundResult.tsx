@@ -7,6 +7,7 @@ import CrownAnimation from './CrownAnimation';
 import { playKingFoundSound, playWrongSound } from '@/lib/sounds';
 import { pickQuestion } from '@/lib/questionPicker';
 import { ShieldX, ArrowRight, ArrowRightLeft } from 'lucide-react';
+import TeamEmoji from './TeamEmoji';
 
 export default function RoundResult() {
   const {
@@ -24,7 +25,6 @@ export default function RoundResult() {
   } = useGameStore();
 
   const nextAttackerName = currentAttacker === 'team_a' ? teamA.name : teamB.name;
-  const nextAttackerEmoji = currentAttacker === 'team_a' ? '🐲' : '🐯';
   const nextAttackerColor = currentAttacker === 'team_a' ? 'text-blue-400' : 'text-amber-400';
 
   useEffect(() => {
@@ -36,15 +36,18 @@ export default function RoundResult() {
   }, [lastGuessResult]);
 
   const handleNext = () => {
-    const next = pickQuestion(questionPool, usedQuestionIds);
-    if (next) setCurrentQuestion(next);
+    // store guessKing에서 이미 새 문제 로드됨 — phase만 전환
+    if (!useGameStore.getState().currentQuestion) {
+      const next = pickQuestion(questionPool, usedQuestionIds);
+      if (next) setCurrentQuestion(next);
+    }
     setPhase('QUIZ');
   };
 
-  // 왕 지목 오답 시 4초 후 자동 진행 (안전망)
+  // 왕 지목 오답 시 3.5초 후 자동 진행
   useEffect(() => {
     if (lastGuessResult === 'not_found' && phase === 'ROUND_RESULT') {
-      const timer = setTimeout(() => handleNext(), 4000);
+      const timer = setTimeout(() => handleNext(), 3500);
       return () => clearTimeout(timer);
     }
   }, [lastGuessResult, phase]);
@@ -112,7 +115,7 @@ export default function RoundResult() {
       >
         <ArrowRightLeft className="w-6 h-6 text-purple-400" />
         <span className="text-gray-400">공격권이</span>
-        <span className="text-3xl">{nextAttackerEmoji}</span>
+        <TeamEmoji team={currentAttacker} size={36} />
         <span className={`text-2xl font-black ${nextAttackerColor}`}>{nextAttackerName}</span>
         <span className="text-gray-400">에게!</span>
       </motion.div>

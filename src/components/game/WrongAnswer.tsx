@@ -4,12 +4,12 @@ import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import { ArrowRightLeft } from 'lucide-react';
+import TeamEmoji from './TeamEmoji';
 
 export default function WrongAnswer() {
   const { currentAttacker, teamA, teamB, setPhase } = useGameStore();
 
   const attackerName = currentAttacker === 'team_a' ? teamA.name : teamB.name;
-  const attackerEmoji = currentAttacker === 'team_a' ? '🐲' : '🐯';
   const attackerColor = currentAttacker === 'team_a' ? 'text-blue-400' : 'text-amber-400';
 
   // 2초 후 자동으로 퀴즈로 이동
@@ -48,7 +48,7 @@ export default function WrongAnswer() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <span className="text-5xl">{attackerEmoji}</span>
+        <TeamEmoji team={currentAttacker} size={56} />
         <div>
           <p className="text-gray-400 text-lg">다음 공격</p>
           <p className={`text-3xl font-black ${attackerColor}`}>{attackerName}</p>

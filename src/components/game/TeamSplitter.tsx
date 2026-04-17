@@ -7,6 +7,7 @@ import StudentCard from './StudentCard';
 import { shuffleArray } from '@/lib/utils';
 import { playShuffleSound, playButtonClick } from '@/lib/sounds';
 import { Shuffle, Check, ArrowLeftRight, Save, FolderOpen, Trash2 } from 'lucide-react';
+import TeamEmoji from './TeamEmoji';
 
 interface SavedTeam {
   name: string;
@@ -172,7 +173,7 @@ export default function TeamSplitter() {
           animate={{ x: 0, opacity: 1 }}
         >
           <div className="flex items-center gap-3 mb-3">
-            <span className="text-4xl">🐲</span>
+            <TeamEmoji team="team_a" size={44} />
             <input
               value={teamAName}
               onChange={(e) => setTeamAName(e.target.value)}
@@ -220,7 +221,7 @@ export default function TeamSplitter() {
           animate={{ x: 0, opacity: 1 }}
         >
           <div className="flex items-center gap-3 mb-3">
-            <span className="text-4xl">🐯</span>
+            <TeamEmoji team="team_b" size={44} />
             <input
               value={teamBName}
               onChange={(e) => setTeamBName(e.target.value)}

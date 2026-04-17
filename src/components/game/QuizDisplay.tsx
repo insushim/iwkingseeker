@@ -8,8 +8,9 @@ import { playCorrectSound, playWrongSound } from '@/lib/sounds';
 import { cn } from '@/lib/utils';
 import { Sparkles, Zap, HelpCircle } from 'lucide-react';
 import WhackAMole from './quiz-modes/WhackAMole';
-import SpinWheel from './quiz-modes/SpinWheel';
 import MatchingPairs from './quiz-modes/MatchingPairs';
+import SmartText from './SmartText';
+import TeamEmoji from './TeamEmoji';
 
 /**
  * 문제 표시 스타일:
@@ -18,10 +19,9 @@ import MatchingPairs from './quiz-modes/MatchingPairs';
  * 'bigcard' — 큰 카드 (한 줄씩 크게)
  * 'speed'   — 스피드 퀴즈 (번호 대형)
  * 'whack'   — 두더지 잡기
- * 'wheel'   — 룰렛
  * 'cards'   — 카드 뒤집기
  */
-type QuizStyle = 'grid' | 'list' | 'bigcard' | 'speed' | 'whack' | 'wheel' | 'cards';
+type QuizStyle = 'grid' | 'list' | 'bigcard' | 'speed' | 'whack' | 'cards';
 
 const STYLE_COLORS = [
   { bg: 'bg-red-600/80 hover:bg-red-500/90 border-red-400/40', glow: 'hover:shadow-red-500/20 hover:shadow-lg', label: 'A' },
@@ -108,7 +108,6 @@ export default function QuizDisplay() {
   const [showHint, setShowHint] = useState(false);
 
   const attackerName = currentAttacker === 'team_a' ? teamA.name : teamB.name;
-  const attackerEmoji = currentAttacker === 'team_a' ? '🐲' : '🐯';
 
   // 문제마다 다른 스타일 - 문제 번호 기반으로 순환
   // 게임 스타일(whack/wheel/cards)은 4지선다일 때만 의미가 있음
@@ -117,7 +116,7 @@ export default function QuizDisplay() {
       currentQuestion?.question_type === 'multiple_choice' &&
       (currentQuestion?.options?.length ?? 0) === 4;
     const styles: QuizStyle[] = isFourChoice
-      ? ['grid', 'whack', 'list', 'wheel', 'bigcard', 'cards', 'speed']
+      ? ['grid', 'whack', 'list', 'bigcard', 'cards', 'speed']
       : ['grid', 'list', 'bigcard', 'speed'];
     return styles[totalQuestionsAsked % styles.length]!;
   }, [totalQuestionsAsked, currentQuestion]);
@@ -188,8 +187,6 @@ export default function QuizDisplay() {
     ? '스피드'
     : quizStyle === 'whack'
     ? '🔨 두더지'
-    : quizStyle === 'wheel'
-    ? '🎯 룰렛'
     : '🃏 뒤집기';
 
   return (
@@ -204,7 +201,7 @@ export default function QuizDisplay() {
           animate={{ scale: [1, 1.03, 1] }}
           transition={{ repeat: Infinity, duration: 2 }}
         >
-          <span className="text-2xl">{attackerEmoji}</span>
+          <TeamEmoji team={currentAttacker} size={28} />
           <span>공격: {attackerName}</span>
         </motion.div>
 
@@ -243,7 +240,7 @@ export default function QuizDisplay() {
               {q.subject} &middot; {q.unit}
             </p>
             <h3 className="text-4xl md:text-5xl font-bold text-white leading-relaxed">
-              {q.question_text}
+              <SmartText text={q.question_text} />
             </h3>
           </div>
           {quizStyle === 'speed' && !isOX && (
@@ -320,7 +317,7 @@ export default function QuizDisplay() {
                 transition={{ delay: i * 0.08 }}
               >
                 <span className="mr-4 text-4xl font-black opacity-40">{style.label}</span>
-                {option}
+                <SmartText text={option} />
               </motion.button>
             );
           })}
@@ -350,22 +347,13 @@ export default function QuizDisplay() {
                 transition={{ delay: i * 0.12, type: 'spring', stiffness: 200 }}
               >
                 <span className="text-4xl">{STYLE_EMOJIS[i]}</span>
-                <span className="flex-1">{option}</span>
+                <span className="flex-1"><SmartText text={option} /></span>
               </motion.button>
             );
           })}
         </div>
       ) : quizStyle === 'whack' ? (
         <WhackAMole
-          options={options}
-          correctAnswer={q.correct_answer}
-          selectedAnswer={selectedAnswer}
-          showResult={showResult}
-          isCorrect={isCorrect}
-          onAnswer={handleAnswer}
-        />
-      ) : quizStyle === 'wheel' ? (
-        <SpinWheel
           options={options}
           correctAnswer={q.correct_answer}
           selectedAnswer={selectedAnswer}
@@ -407,7 +395,7 @@ export default function QuizDisplay() {
                 transition={{ delay: i * 0.1, type: 'spring' }}
               >
                 <span className="text-5xl mb-2 opacity-30">{style.label}</span>
-                <span className="px-4 leading-snug">{option}</span>
+                <span className="px-4 leading-snug"><SmartText text={option} /></span>
               </motion.button>
             );
           })}
@@ -437,7 +425,7 @@ export default function QuizDisplay() {
                 transition={{ delay: i * 0.05 }}
               >
                 <span className="text-4xl font-black opacity-50 shrink-0 w-12 text-center">{i + 1}</span>
-                <span className="flex-1">{option}</span>
+                <span className="flex-1"><SmartText text={option} /></span>
               </motion.button>
             );
           })}

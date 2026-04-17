@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
 import { cn } from '@/lib/utils';
 import { Swords } from 'lucide-react';
+import TeamEmoji from './TeamEmoji';
 
 export default function ScoreBoard() {
   const { teamA, teamB, currentAttacker, targetScore } = useGameStore();
@@ -26,7 +27,7 @@ export default function ScoreBoard() {
       <TeamScore
         name={teamA.name}
         score={teamA.score}
-        emoji="🐲"
+        team="team_a"
         isActive={currentAttacker === 'team_a'}
         colorClass="text-blue-400"
         glowClass="glow-blue"
@@ -48,7 +49,7 @@ export default function ScoreBoard() {
       <TeamScore
         name={teamB.name}
         score={teamB.score}
-        emoji="🐯"
+        team="team_b"
         isActive={currentAttacker === 'team_b'}
         colorClass="text-amber-400"
         glowClass="glow-amber"
@@ -62,7 +63,7 @@ export default function ScoreBoard() {
 function TeamScore({
   name,
   score,
-  emoji,
+  team,
   isActive,
   colorClass,
   glowClass,
@@ -71,7 +72,7 @@ function TeamScore({
 }: {
   name: string;
   score: number;
-  emoji: string;
+  team: 'team_a' | 'team_b';
   isActive: boolean;
   colorClass: string;
   glowClass: string;
@@ -96,13 +97,13 @@ function TeamScore({
         />
       )}
 
-      <motion.span
-        className="text-4xl relative z-10"
+      <motion.div
+        className="relative z-10 flex items-center justify-center"
         animate={isActive ? { scale: [1, 1.1, 1] } : {}}
         transition={{ repeat: isActive ? Infinity : 0, duration: 1.5 }}
       >
-        {emoji}
-      </motion.span>
+        <TeamEmoji team={team} size={40} />
+      </motion.div>
 
       <div className="flex flex-col relative z-10">
         <span className={cn('text-xl font-bold', colorClass)}>{name}</span>

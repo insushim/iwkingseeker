@@ -6,6 +6,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { playVictoryFanfare } from '@/lib/sounds';
 import { Trophy, RotateCcw, Home, Crown } from 'lucide-react';
 import Link from 'next/link';
+import TeamEmoji from './TeamEmoji';
 
 export default function GameOver() {
   const {
@@ -18,10 +19,9 @@ export default function GameOver() {
     resetGame,
   } = useGameStore();
 
-  const winner = teamA.score >= targetScore ? 'team_a' : 'team_b';
+  const winner: 'team_a' | 'team_b' = teamA.score >= targetScore ? 'team_a' : 'team_b';
   const winnerData = winner === 'team_a' ? teamA : teamB;
   const loserData = winner === 'team_a' ? teamB : teamA;
-  const winnerEmoji = winner === 'team_a' ? '🐲' : '🐯';
   const winnerGradient = winner === 'team_a' ? 'from-blue-400 to-cyan-400' : 'from-amber-400 to-yellow-400';
   const winnerGlow = winner === 'team_a' ? 'glow-blue' : 'glow-amber';
 
@@ -116,13 +116,13 @@ export default function GameOver() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.6 }}
       >
-        <motion.span
-          className="text-7xl block mb-4"
+        <motion.div
+          className="flex justify-center mb-4"
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          {winnerEmoji}
-        </motion.span>
+          <TeamEmoji team={winner} size={96} />
+        </motion.div>
         <h1
           className={`text-6xl md:text-7xl font-black bg-gradient-to-r ${winnerGradient} bg-clip-text text-transparent`}
           style={{

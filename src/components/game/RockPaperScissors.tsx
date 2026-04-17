@@ -5,6 +5,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { playRPSReveal, playRPSBeat } from '@/lib/sounds';
 import { Crown, Zap } from 'lucide-react';
 import { useState } from 'react';
+import TeamEmoji from './TeamEmoji';
 
 export default function RockPaperScissors() {
   const { teamA, teamB, setRPSResult } = useGameStore();
@@ -59,13 +60,12 @@ export default function RockPaperScissors() {
           transition={{ delay: 0.3 }}
           disabled={selecting}
         >
-          <motion.span
-            className="text-7xl"
+          <motion.div
             animate={{ rotate: [0, -5, 5, 0] }}
             transition={{ repeat: Infinity, duration: 3 }}
           >
-            🐲
-          </motion.span>
+            <TeamEmoji team="team_a" size={110} />
+          </motion.div>
           <span
             className="text-3xl font-black text-blue-400"
             style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
@@ -106,13 +106,12 @@ export default function RockPaperScissors() {
           transition={{ delay: 0.3 }}
           disabled={selecting}
         >
-          <motion.span
-            className="text-7xl"
+          <motion.div
             animate={{ rotate: [0, 5, -5, 0] }}
             transition={{ repeat: Infinity, duration: 3 }}
           >
-            🐯
-          </motion.span>
+            <TeamEmoji team="team_b" size={110} />
+          </motion.div>
           <span
             className="text-3xl font-black text-amber-400"
             style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}

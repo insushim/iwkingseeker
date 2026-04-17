@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import type { GameState, GamePhase, Question, QuestionRecord, RoundRecord } from '@/types';
+import { pickQuestion } from '@/lib/questionPicker';
 
 interface GameActions {
   setPhase: (phase: GamePhase) => void;
@@ -128,14 +129,17 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
     } else {
       const newAttacker: 'team_a' | 'team_b' =
         state.currentAttacker === 'team_a' ? 'team_b' : 'team_a';
+      const newUsedIds = state.currentQuestion
+        ? [...state.usedQuestionIds, state.currentQuestion.id]
+        : state.usedQuestionIds;
+      const nextQuestion = pickQuestion(state.questionPool, newUsedIds);
       set({
         currentRoundQuestions: [...state.currentRoundQuestions, record],
         currentAttacker: newAttacker,
-        currentQuestion: null,
+        currentQuestion: nextQuestion,
+        totalQuestionsAsked: nextQuestion ? state.totalQuestionsAsked + 1 : state.totalQuestionsAsked,
         phase: 'WRONG_ANSWER',
-        usedQuestionIds: state.currentQuestion
-          ? [...state.usedQuestionIds, state.currentQuestion.id]
-          : state.usedQuestionIds,
+        usedQuestionIds: newUsedIds,
       });
     }
   },
@@ -218,15 +222,17 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
           phase: isGameOver ? 'GAME_OVER' : 'ROUND_RESULT',
         });
       } else {
-        // 왕 못맞추면 공격권 전환
+        // 왕 못맞추면 공격권 전환 + 다음 문제 즉시 로드 (blank 방지)
         const newAttacker: 'team_a' | 'team_b' =
           state.currentAttacker === 'team_a' ? 'team_b' : 'team_a';
+        const nextQuestion = pickQuestion(state.questionPool, state.usedQuestionIds);
         set({
           [revealedKey]: newRevealed,
           currentRoundQuestions: updatedRoundQuestions,
           lastGuessResult: 'not_found',
           lastGuessedStudent: studentName,
-          currentQuestion: null,
+          currentQuestion: nextQuestion,
+          totalQuestionsAsked: nextQuestion ? state.totalQuestionsAsked + 1 : state.totalQuestionsAsked,
           currentAttacker: newAttacker,
           phase: 'ROUND_RESULT',
         });
