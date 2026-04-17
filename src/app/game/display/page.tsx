@@ -668,6 +668,7 @@ function DisplayQuiz({ state, channelRef }: { state: DisplayState; channelRef: R
 function DisplayWrongAnswer({ state }: { state: DisplayState }) {
   const attackerName = state.currentAttacker === 'team_a' ? state.teamA.name : state.teamB.name;
   const attackerColor = state.currentAttacker === 'team_a' ? 'text-blue-400' : 'text-amber-400';
+  const isWrongKing = state.lastGuessResult === 'not_found';
 
   return (
     <div className="flex flex-col items-center justify-center gap-6">
@@ -676,8 +677,8 @@ function DisplayWrongAnswer({ state }: { state: DisplayState }) {
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15 }}
       >
-        <div className="p-6 rounded-full glass-strong" style={{ boxShadow: '0 0 30px rgba(147,51,234,0.3)' }}>
-          <ArrowRightLeft className="w-16 h-16 text-purple-400" />
+        <div className="p-6 rounded-full glass-strong" style={{ boxShadow: isWrongKing ? '0 0 30px rgba(239,68,68,0.3)' : '0 0 30px rgba(147,51,234,0.3)' }}>
+          {isWrongKing ? <ShieldX className="w-16 h-16 text-red-400" /> : <ArrowRightLeft className="w-16 h-16 text-purple-400" />}
         </div>
       </motion.div>
       <motion.h2
@@ -685,10 +686,23 @@ function DisplayWrongAnswer({ state }: { state: DisplayState }) {
         style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: 0.2 }}
       >
-        공수 교대!
+        {isWrongKing ? '왕이 아닙니다!' : '공수 교대!'}
       </motion.h2>
+      {isWrongKing && state.lastGuessedStudent && (
+        <motion.div
+          className="glass rounded-xl px-6 py-3"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.35 }}
+        >
+          <p className="text-xl text-gray-300">
+            <span className="text-white font-bold">{state.lastGuessedStudent}</span>
+            <span className="text-gray-400"> 학생은 왕이 아닙니다.</span>
+          </p>
+        </motion.div>
+      )}
       <motion.div
         className="flex items-center gap-4 glass-strong rounded-2xl px-8 py-4"
         initial={{ y: 20, opacity: 0 }}

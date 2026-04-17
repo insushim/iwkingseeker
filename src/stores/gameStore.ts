@@ -140,6 +140,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
         totalQuestionsAsked: nextQuestion ? state.totalQuestionsAsked + 1 : state.totalQuestionsAsked,
         phase: 'WRONG_ANSWER',
         usedQuestionIds: newUsedIds,
+        lastGuessResult: null, // 퀴즈 오답: 왕 오답과 구분
       });
     }
   },
@@ -222,7 +223,8 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
           phase: isGameOver ? 'GAME_OVER' : 'ROUND_RESULT',
         });
       } else {
-        // 왕 못맞추면 공격권 전환 + 다음 문제 즉시 로드 (blank 방지)
+        // 왕 못맞추면 공격권 전환 + 다음 문제 즉시 로드
+        // 검증된 WRONG_ANSWER phase로 보내 auto-advance 보장
         const newAttacker: 'team_a' | 'team_b' =
           state.currentAttacker === 'team_a' ? 'team_b' : 'team_a';
         const nextQuestion = pickQuestion(state.questionPool, state.usedQuestionIds);
@@ -234,7 +236,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
           currentQuestion: nextQuestion,
           totalQuestionsAsked: nextQuestion ? state.totalQuestionsAsked + 1 : state.totalQuestionsAsked,
           currentAttacker: newAttacker,
-          phase: 'ROUND_RESULT',
+          phase: 'WRONG_ANSWER',
         });
       }
     }

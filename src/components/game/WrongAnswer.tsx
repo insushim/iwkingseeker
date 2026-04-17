@@ -3,22 +3,24 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useGameStore } from '@/stores/gameStore';
-import { ArrowRightLeft } from 'lucide-react';
+import { ArrowRightLeft, ShieldX } from 'lucide-react';
 import TeamEmoji from './TeamEmoji';
 
 export default function WrongAnswer() {
-  const { currentAttacker, teamA, teamB, setPhase } = useGameStore();
+  const { currentAttacker, teamA, teamB, setPhase, lastGuessResult, lastGuessedStudent } = useGameStore();
 
   const attackerName = currentAttacker === 'team_a' ? teamA.name : teamB.name;
   const attackerColor = currentAttacker === 'team_a' ? 'text-blue-400' : 'text-amber-400';
 
-  // 2초 후 자동으로 퀴즈로 이동
+  const isWrongKing = lastGuessResult === 'not_found';
+  const autoDelay = isWrongKing ? 3500 : 2000;
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setPhase('QUIZ');
-    }, 2000);
+    }, autoDelay);
     return () => clearTimeout(timer);
-  }, [setPhase]);
+  }, [setPhase, autoDelay]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-6">
@@ -27,8 +29,15 @@ export default function WrongAnswer() {
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15 }}
       >
-        <div className="p-6 rounded-full glass-strong" style={{ boxShadow: '0 0 30px rgba(147,51,234,0.3)' }}>
-          <ArrowRightLeft className="w-16 h-16 text-purple-400" />
+        <div
+          className="p-6 rounded-full glass-strong"
+          style={{ boxShadow: isWrongKing ? '0 0 30px rgba(239,68,68,0.3)' : '0 0 30px rgba(147,51,234,0.3)' }}
+        >
+          {isWrongKing ? (
+            <ShieldX className="w-16 h-16 text-red-400" />
+          ) : (
+            <ArrowRightLeft className="w-16 h-16 text-purple-400" />
+          )}
         </div>
       </motion.div>
 
@@ -37,10 +46,24 @@ export default function WrongAnswer() {
         style={{ fontFamily: "var(--font-heading), 'Black Han Sans', sans-serif" }}
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: 0.2 }}
       >
-        공수 교대!
+        {isWrongKing ? '왕이 아닙니다!' : '공수 교대!'}
       </motion.h2>
+
+      {isWrongKing && lastGuessedStudent && (
+        <motion.div
+          className="glass rounded-xl px-6 py-3"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.35 }}
+        >
+          <p className="text-xl text-gray-300">
+            <span className="text-white font-bold">{lastGuessedStudent}</span>
+            <span className="text-gray-400"> 학생은 왕이 아닙니다.</span>
+          </p>
+        </motion.div>
+      )}
 
       <motion.div
         className="flex items-center gap-4 glass-strong rounded-2xl px-8 py-4"
